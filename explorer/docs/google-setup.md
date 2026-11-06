@@ -2,11 +2,11 @@
 
 ## Google Maps
 
-The explorer loads the Google Maps JavaScript vector map with the Patria Lab Muted cloud style. Use the layer menu for the tilted 3D roadmap, a flat view, satellite imagery, or live traffic. Street View opens Google's native panorama from the map center or a place card. Pegman shows imagery coverage and lets you choose a street. [Map building styles](https://developers.google.com/maps/documentation/javascript/cloud-customization/building-style) [Street View](https://developers.google.com/maps/documentation/javascript/streetview)
+The explorer opens in Google Photorealistic 3D. The hybrid view combines aerial imagery with street labels and renders building geometry where Google has coverage. The layer menu also offers the Patria Lab Muted vector map, a flat map, and overhead satellite imagery. Patria loads the standard map when one of these layers, live traffic, or Street View is opened. Street View opens Google's panorama at the map center or a place, and Pegman shows coverage on the standard map. [Google Photorealistic 3D](https://developers.google.com/maps/documentation/javascript/3d/overview) [Street View](https://developers.google.com/maps/documentation/javascript/streetview)
 
 The Patria Browser key in `patria-510720` is limited to Maps JavaScript and Patria's two hosted origins and loopback development URLs. Sites supplies `GOOGLE_MAPS_BROWSER_KEY` at runtime. For local development, put it in `.env`. The style lives on the Patria Lab vector Map ID in `patria-513913`. Set `GOOGLE_MAPS_MAP_ID` to override that ID. The Worker returns only these public browser settings to the explorer.
 
-Photon supplies independent location search and nearby places from OpenStreetMap. Suggested walks link to Google Maps for directions. Live traffic colors show current road conditions where Google has coverage. Historical traffic counts are available in `data/traffic/`. [Map sources](https://patria.rgbknights.com/setup) [Traffic layer](https://developers.google.com/maps/documentation/javascript/trafficlayer)
+Photon supplies independent location search and nearby places from OpenStreetMap. Suggested walks link to Google Maps for directions. Live traffic colors show current road conditions where Google has coverage. Enabling traffic from Photorealistic 3D opens the styled map. Historical traffic counts are available in `data/traffic/`. [Map sources](https://patria.rgbknights.com/setup) [Traffic layer](https://developers.google.com/maps/documentation/javascript/trafficlayer)
 
 ## Create a Marble scene
 

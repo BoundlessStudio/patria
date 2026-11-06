@@ -1,6 +1,6 @@
 # Patria neighborhood explorer
 
-Patria pairs a styled Google vector map and native Street View with neighborhood discovery and suggested walks.
+Patria pairs Google Photorealistic 3D and native Street View with neighborhood discovery and suggested walks.
 
 Run `npm run dev` and open http://127.0.0.1:4173/preview. Set `GOOGLE_MAPS_BROWSER_KEY` in the local `.env` to load the map. The onboarding preview is /preview?wizard=1.
 

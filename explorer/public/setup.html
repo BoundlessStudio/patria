@@ -11,11 +11,11 @@
  <main>
   <a class="brand" href="/">patria<span class="brand-period">.</span></a>
   <h1>Map sources</h1>
-  <p><a href="https://developers.google.com/maps/documentation/javascript">Google Maps</a> supplies the vector roadmap, satellite layer, and Street View. The Patria cloud style sets muted colors for roads, parks, water, and buildings. Extruded buildings appear at close zoom where Google has coverage.</p>
+  <p>Patria opens in <a href="https://developers.google.com/maps/documentation/javascript/3d/overview">Google Photorealistic 3D</a>, which uses aerial imagery to render buildings and trees where 3D coverage is available. Use the layers menu for the muted styled map, a flat map, or overhead satellite imagery. Street View opens Google's panorama from any map layer.</p>
   <p>Sign in on the hosted site to discover places. <a href="https://github.com/komoot/photon">Photon</a> supplies location search and nearby places from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>. Suggested walks link to Google Maps for directions.</p>
   <p>The app uses a website-restricted Maps JavaScript browser key. For local setup, put the key in <code>GOOGLE_MAPS_BROWSER_KEY</code> in <code>.env</code> and run <code>npm run dev</code>.</p>
   <h2 id="traffic">Live traffic</h2>
-  <p>Turn on Live traffic in the map layers menu to see current road conditions where Google has coverage. The colors represent traffic flow. Published vehicle counts are kept separately as historical data.</p>
+  <p>Turn on Live traffic in the map layers menu to see current road conditions where Google has coverage. From Photorealistic 3D, Patria switches to the styled map to show the traffic overlay. The colors represent traffic flow. Published vehicle counts are kept separately as historical data.</p>
   <ul>
    <li><a href="https://open.toronto.ca/dataset/traffic-volumes-midblock-vehicle-speed-volume-and-classification-counts/">Toronto midblock traffic counts</a>. Contains information licensed under the <a href="https://open.toronto.ca/open-data-licence/">Open Government Licence – Toronto</a>.</li>
    <li><a href="https://data.calgary.ca/d/cauu-7hnw">Calgary 2024 traffic volumes</a>. Contains information licensed under the <a href="https://data.calgary.ca/stories/s/u45n-7awa/">Open Government Licence – City of Calgary</a>.</li>

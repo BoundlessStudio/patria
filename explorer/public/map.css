@@ -1,3 +1,30 @@
+.map-surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.map-surface[data-active] { visibility: visible; opacity: 1; }
+#map-photo > gmp-map-3d { display: block; width: 100%; height: 100%; }
+
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 400;
+  transform: translate(-50%, -50%);
+  padding: 10px 15px;
+  border-radius: 7px;
+  background: #22282ef0;
+  color: #f4efe3;
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
 .map-section .map-top { border-color: transparent; }
 
 .map-section .map-heading,
@@ -24,7 +51,7 @@
 }
 
 .street-view-launch { bottom: 76px; }
-.street-view-back { top: 24px; }
+.street-view-back { bottom: 52px; }
 .street-view-launch:disabled { display: none; }
 .traffic-status {
   bottom: 129px;

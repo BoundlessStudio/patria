@@ -45,8 +45,14 @@ const curated = [
 const state={area:neighborhoods[0],center:neighborhoods[0].center,places:curated.filter(p=>p.area==='kensington'),view:'explore',category:'all',selected:null,tour:null,loading:false,error:'',request:0};
 const neighborhoodTilt = 50;
 const neighborhoodZoom = 17.6;
-let map, AdvancedMarkerElement, routeLine, traffic, streetService, streetSource, streetPreference;
-let mapLayer = '3d', streetRequest = 0, streetInvoker, markers = [], searchController, nearbyController, toastTimer;
+const neighborhoodRange = 820;
+const terrainSampleHeight = 1000;
+const photoSurface = $('#map-photo');
+const standardSurface = $('#map-standard');
+let mapId, mapLayer, layerRequest = 0, googleFailed = false;
+let map, standardMapReady, AdvancedMarkerElement, routeLine, traffic, streetService, streetSource, streetPreference;
+let photoMap, photoLibrary, photoPin, photoUnavailable = false, photoMarkers = [], photoWalk, photoAnchor, photoFlight, photoLoadingTimer;
+let streetRequest = 0, streetInvoker, markers = [], searchController, nearbyController, toastTimer;
 let marbleWorlds;
 let saved=[],savedKey='patria-saved:preview',preferredInterests=[]; function configureSaved(user){savedKey='patria-saved:'+(user?.id||'preview');try{saved=JSON.parse(localStorage.getItem(savedKey)||'[]').filter(p=>p&&typeof p.id==='string'&&(p.provider==='google'||(typeof p.name==='string'&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)))).slice(0,100);}catch{saved=[];}render();}
 function persist(){try{localStorage.setItem(savedKey,JSON.stringify(saved));}catch{toast('Saved for this visit. Your browser’s storage is unavailable.');}}
@@ -75,14 +81,17 @@ function setMapControls(enabled) {
 function showMapError(message) {
  $('#map-error').querySelector('span').textContent = message;
  $('#map-error').hidden = false;
+ $('#map-loading').hidden = true;
  setMapControls(false);
- map = undefined;
+ mapLayer = undefined;
+ showMapSurface();
  renderDetail();
 }
 
 async function initializeGoogleMap() {
- const { browserKey, mapId } = await api('/api/map-config');
- let authorizationFailed = false;
+ const config = await api('/api/map-config');
+ const { browserKey } = config;
+ mapId = config.mapId;
  await new Promise((resolve, reject) => {
   const script = document.createElement('script');
   const timer = setTimeout(() => reject(new Error('Google Maps took too long to load. Refresh the page to try again.')), 15000);
@@ -92,7 +101,7 @@ async function initializeGoogleMap() {
   };
   window.gm_authFailure = () => {
    clearTimeout(timer);
-   authorizationFailed = true;
+   googleFailed = true;
    const message = 'Google Maps could not authorize this site address.';
    showMapError(message);
    reject(new Error(message));
@@ -106,15 +115,110 @@ async function initializeGoogleMap() {
   script.async = true;
   document.head.append(script);
  });
+ if (!googleFailed) await setLayer('photo');
+}
+
+function showMapSurface() {
+ const panoramaVisible = map?.getStreetView().getVisible();
+ const active = mapLayer === 'photo' && !panoramaVisible ? photoSurface : standardSurface;
+ for (const surface of [photoSurface, standardSurface]) {
+  const visible = Boolean(mapLayer) && surface === active;
+  surface.toggleAttribute('data-active', visible);
+  surface.inert = !visible;
+ }
+}
+
+async function createPhotoMap() {
+ const [library, { PinElement }] = await Promise.all([
+  google.maps.importLibrary('maps3d'), google.maps.importLibrary('marker'),
+ ]);
+ if (googleFailed) return;
+ photoLibrary = library;
+ photoPin = PinElement;
+ const [lat, lng] = neighborhoods[0].center;
+ photoAnchor = { lat, lng };
+ // Seed the camera above Toronto while the renderer loads its terrain.
+ photoMap = new library.Map3DElement({
+  center: { lat, lng, altitude: 105 }, range: neighborhoodRange, tilt: neighborhoodTilt,
+  mode: 'HYBRID', defaultUIHidden: true, description: 'Photorealistic neighborhood map',
+ });
+ photoMap.addEventListener('gmp-error', () => {
+  disablePhotoMap();
+  if (mapLayer === 'photo') {
+   setLayer('styled').then(changed => {
+    if (changed) toast('Photorealistic 3D could not load. Showing the styled map.');
+   });
+  }
+ });
+ photoMap.addEventListener('gmp-click', event => {
+  if (event.placeId) event.preventDefault();
+ });
+ photoMap.addEventListener('gmp-camerapositionchange', () => {
+  const camera = photoMap.cameraPosition;
+  if (!photoFlight || !camera || cameraOffset(camera, photoFlight.center) > 0.00003) return;
+  const view = photoFlight;
+  photoFlight = undefined;
+  framePhotoCamera(view, camera.altitude - terrainSampleHeight);
+ });
+ photoMap.addEventListener('pointerdown', () => {
+  streetRequest++;
+  if (photoFlight) {
+   photoMap.stopCameraAnimation();
+   photoFlight = undefined;
+  }
+ });
+ photoMap.addEventListener('gmp-headingchange', updateNorth);
+ photoMap.addEventListener('gmp-centerchange', () => {
+  if (mapLayer !== 'photo' || photoFlight) return;
+  const center = photoMap.center;
+  if (center && cameraOffset(center, photoAnchor) > 0.00024) {
+   $('#search-area').hidden = false;
+  }
+ });
+ photoMap.addEventListener('gmp-steadychange', event => {
+  if (!event.isSteady || photoFlight) return;
+  $('#photo-loading').hidden = true;
+  clearTimeout(photoLoadingTimer);
+ });
+ showPhotoLoading();
+ photoSurface.prepend(photoMap);
+}
+
+function showPhotoLoading() {
+ const loading = $('#photo-loading');
+ loading.hidden = false;
+ clearTimeout(photoLoadingTimer);
+ photoLoadingTimer = setTimeout(() => {
+  loading.hidden = true;
+  if (mapLayer === 'photo' && photoFlight) {
+   setLayer('styled').then(changed => {
+    if (changed) toast('3D imagery took too long to load. Showing the styled map.');
+   });
+  }
+ }, 20000);
+}
+
+function disablePhotoMap() {
+ photoUnavailable = true;
+ $('[data-layer="photo"]').disabled = true;
+}
+
+function ensureStandardMap() {
+ return standardMapReady ??= createStandardMap().catch(error => {
+  standardMapReady = undefined;
+  throw error;
+ });
+}
+
+async function createStandardMap() {
  const [maps, marker, street] = await Promise.all([
   google.maps.importLibrary('maps'), google.maps.importLibrary('marker'), google.maps.importLibrary('streetView'),
  ]);
- if (authorizationFailed) return;
-
- const [lat, lng] = state.selected ? [state.selected.lat, state.selected.lng] : state.center;
- map = new maps.Map($('#map'), {
+ if (googleFailed) return;
+ const { center, zoom, heading } = mapView();
+ map = new maps.Map(standardSurface, {
   mapId, renderingType: google.maps.RenderingType.VECTOR,
-  center: { lat, lng }, zoom: neighborhoodZoom, tilt: neighborhoodTilt, heading: 0,
+  center, zoom, tilt: neighborhoodTilt, heading,
   disableDefaultUI: true, streetViewControl: true, clickableIcons: false,
   streetViewControlOptions: { position: google.maps.ControlPosition.INLINE_START_BLOCK_END },
  });
@@ -131,28 +235,96 @@ async function initializeGoogleMap() {
   $('.map-section').toggleAttribute('data-street-view', visible);
   const backButton = $('#street-view-back');
   backButton.hidden = !visible;
+  showMapSurface();
   if (visible) {
    streetRequest++;
    backButton.focus({ preventScroll: true });
   }
  });
- map.addListener('dragstart', () => { streetRequest++; });
- map.addListener('dragend', () => { $('#search-area').hidden = false; });
- setMapControls(true);
- renderMarkers();
- renderWalk();
- renderDetail();
+ map.addListener('dragstart', () => { if (mapLayer !== 'photo') streetRequest++; });
+ map.addListener('dragend', () => { if (mapLayer !== 'photo') $('#search-area').hidden = false; });
+ map.addListener('heading_changed', updateNorth);
+}
+
+function mapView() {
+ if (mapLayer === 'photo') {
+  if (photoFlight) return photoFlight;
+  const center = photoMap.center;
+  const range = photoMap.range || neighborhoodRange;
+  return {
+   center: { lat: center.lat, lng: center.lng },
+   zoom: neighborhoodZoom + Math.log2(neighborhoodRange / range),
+   heading: photoMap.heading || 0,
+  };
+ }
+ const center = mapLayer && map?.getCenter()?.toJSON();
+ const [lat, lng] = state.selected ? [state.selected.lat, state.selected.lng] : state.center;
+ return { center: center || { lat, lng }, zoom: map?.getZoom() ?? neighborhoodZoom, heading: map?.getHeading() || 0 };
 }
 
 function mapCenter() {
- const center = map?.getCenter();
- return center ? [center.lat(), center.lng()] : state.center;
+ const { center } = mapView();
+ return [center.lat, center.lng];
+}
+
+function updateNorth() {
+ const heading = mapLayer === 'photo' ? photoMap.heading : map?.getHeading();
+ $('.map-north span').style.rotate = -(heading || 0) + 'deg';
+}
+
+function cameraOffset(a, b) {
+ const longitude = Math.abs(a.lng - b.lng);
+ return Math.hypot(a.lat - b.lat, Math.min(longitude, 360 - longitude));
+}
+
+function framePhotoCamera({ center, zoom, heading }, altitude) {
+ photoMap.center = { ...center, altitude };
+ photoMap.range = neighborhoodRange * 2 ** (neighborhoodZoom - zoom);
+ photoMap.tilt = neighborhoodTilt;
+ photoMap.heading = heading;
+}
+
+function movePhotoCamera(view) {
+ const { center, heading } = view;
+ const current = photoMap.center;
+ photoAnchor = center;
+ if (photoFlight) photoMap.stopCameraAnimation();
+ if (cameraOffset(current, center) < 0.025) {
+  photoFlight = undefined;
+  framePhotoCamera(view, current.altitude);
+  return;
+ }
+ // Resolve terrain at the destination before applying the tilted camera.
+ showPhotoLoading();
+ photoFlight = view;
+ photoMap.flyCameraTo({
+  endCamera: {
+   cameraPosition: { ...center, altitude: terrainSampleHeight },
+   altitudeMode: photoLibrary.AltitudeMode.RELATIVE_TO_GROUND, range: 0, tilt: 0, heading,
+  },
+  durationMillis: 1,
+ });
 }
 
 function panTo([lat, lng], zoom = neighborhoodZoom) {
- if (!map) return;
+ if (!mapLayer) return;
  closeStreetView();
- map.moveCamera({ center: { lat, lng }, zoom, tilt: mapLayer === '3d' ? neighborhoodTilt : 0 });
+ const center = { lat, lng };
+ if (mapLayer === 'photo') {
+  movePhotoCamera({ center, zoom, heading: mapView().heading });
+  $('#search-area').hidden = true;
+ } else {
+  map.moveCamera({ center, zoom, tilt: mapLayer === 'styled' ? neighborhoodTilt : 0 });
+ }
+}
+
+function zoomMap(change) {
+ if (mapLayer === 'photo') {
+  if (photoFlight) return;
+  photoMap.range = Math.max(35, (photoMap.range || neighborhoodRange) / 2 ** change);
+ } else if (mapLayer) {
+  map.setZoom((map.getZoom() ?? neighborhoodZoom) + change);
+ }
 }
 
 function closeStreetView() {
@@ -162,11 +334,14 @@ function closeStreetView() {
 }
 
 async function openStreetView([lat, lng], button) {
- if (!map) return;
+ if (!mapLayer) return;
+ const { heading } = mapView();
  const request = ++streetRequest;
  button.disabled = true;
  toast('Finding outdoor Street View nearby…');
  try {
+  await ensureStandardMap();
+  if (request !== streetRequest || googleFailed || !button.isConnected) return;
   const { data } = await streetService.getPanorama({
    location: { lat, lng }, radius: 75, preference: streetPreference, sources: [streetSource],
   });
@@ -175,18 +350,22 @@ async function openStreetView([lat, lng], button) {
   const panorama = map.getStreetView();
   streetInvoker = button;
   panorama.setPano(data.location.pano);
-  panorama.setPov({ heading: map.getHeading() || 0, pitch: 0 });
+  panorama.setPov({ heading, pitch: 0 });
   panorama.setVisible(true);
   $('#toast').hidden = true;
  } catch {
-  if (request === streetRequest) toast('Street View is unavailable at this point. Try another spot or drag Pegman to a blue street.');
+  if (request === streetRequest) toast('Street View is unavailable at this point. Try another nearby spot.');
  } finally {
   button.disabled = false;
  }
 }
 
 function renderMarkers() {
- if (!map) return;
+ if (!mapLayer) return;
+ if (mapLayer === 'photo') {
+  renderPhotoMarkers();
+  return;
+ }
  markers.forEach(marker => { marker.map = null; });
  const origin = document.createElement('span');
  origin.className = 'map-origin';
@@ -207,11 +386,46 @@ function renderMarkers() {
   markers.push(marker);
  }
 }
+function renderPhotoMarkers() {
+ for (const marker of photoMarkers) marker.remove();
+ const { Marker3DElement, Marker3DInteractiveElement, AltitudeMode } = photoLibrary;
+ const options = { altitudeMode: AltitudeMode.CLAMP_TO_GROUND, drawsWhenOccluded: true, sizePreserved: true };
+ const [lat, lng] = state.center;
+ const origin = new Marker3DElement({ ...options, position: { lat, lng }, title: 'Your starting point' });
+ origin.append(new photoPin({ background: '#c99551', borderColor: '#fff', glyphColor: '#fff', scale: 0.65 }));
+ photoMarkers = [origin];
+ for (const place of state.tour?.stops || visiblePlaces()) {
+  const selected = place.id === state.selected?.id;
+  const marker = new Marker3DInteractiveElement({
+   ...options, position: { lat: place.lat, lng: place.lng }, title: place.name, zIndex: selected ? 3 : 2,
+  });
+  marker.append(new photoPin({
+   background: selected ? '#cc6246' : '#183e39', borderColor: '#fff', glyphColor: '#fff', scale: selected ? 0.9 : 0.75,
+  }));
+  marker.addEventListener('gmp-click', () => selectPlace(place));
+  photoMarkers.push(marker);
+ }
+ photoMap.append(...photoMarkers);
+}
+
 function renderWalk() {
- if (!routeLine || !map) return;
+ if (!mapLayer) return;
  const coordinates = state.tour?.stops.map(({ lat, lng }) => ({ lat, lng })) ?? [];
- routeLine.setPath(coordinates);
- routeLine.setMap(coordinates.length > 1 ? map : null);
+ if (mapLayer === 'photo') {
+  photoWalk?.remove();
+  if (coordinates.length > 1) {
+   const { Polyline3DElement, AltitudeMode } = photoLibrary;
+   photoWalk = new Polyline3DElement({
+    path: coordinates, altitudeMode: AltitudeMode.CLAMP_TO_GROUND,
+    strokeColor: '#edb979', strokeWidth: 5, outerColor: '#273b34', outerWidth: 0.4,
+    drawsOccludedSegments: true,
+   });
+   photoMap.append(photoWalk);
+  }
+ } else {
+  routeLine.setPath(coordinates);
+  routeLine.setMap(coordinates.length > 1 ? map : null);
+ }
 }
 function marbleLink(kind, target) {
  const world = marbleWorlds?.[kind]?.[target];
@@ -270,7 +484,7 @@ function renderDetail() {
   <h2>${esc(place.name)}</h2>
   <p class="detail-address">${esc(place.address || state.area.name)} · ${distanceLabel(place)}</p>
   ${place.description ? `<p class="detail-description">${esc(place.description)}</p>` : ''}
-  ${map ? `<button class="dark-button detail-street-button" type="button" data-open-street>${icon('street')}Open Street View</button>` : ''}
+  ${mapLayer ? `<button class="dark-button detail-street-button" type="button" data-open-street>${icon('street')}Open Street View</button>` : ''}
   <div class="detail-actions">
    <a href="${directionsUrl([place])}" target="_blank" rel="noopener noreferrer">${icon('walk')}Walking directions</a>
    <button class="save-button ${isSaved ? 'saved' : ''}" data-save="${esc(place.id)}" aria-pressed="${isSaved}">${icon('bookmark')}${isSaved ? 'Saved' : 'Save place'}</button>
@@ -291,21 +505,69 @@ function setView(view){closeStreetView();state.view=view;state.category='all';en
 function closeLayers() {
  $('#layer-options').hidden = true;
  $('#layers-button').setAttribute('aria-expanded', 'false');
- $('#layers-button').focus();
+ $('#layers-button').focus({ preventScroll: true });
 }
-function setLayer(layer) {
- if (!map) return;
+
+async function setLayer(layer) {
+ if (googleFailed || (layer === 'photo' && photoUnavailable)) return false;
+ const request = ++layerRequest;
+ if (layer === mapLayer) {
+  $('#map-loading').hidden = true;
+  return true;
+ }
+ closeStreetView();
+ $('#map-loading').textContent = layer === 'photo' ? 'Loading photorealistic 3D…' : 'Loading the map…';
+ $('#map-loading').hidden = false;
+ try {
+  if (layer === 'photo') {
+   if (!photoMap) await createPhotoMap();
+  } else {
+   await ensureStandardMap();
+  }
+ } catch {
+  if (request !== layerRequest || googleFailed) return false;
+  if (layer === 'photo') {
+   disablePhotoMap();
+   if (!mapLayer) return setLayer('styled');
+   toast('Photorealistic 3D could not load.');
+  } else if (!mapLayer) {
+   showMapError('Google Maps could not load. Refresh the page to try again.');
+  } else {
+   toast('This map layer could not load. Try again.');
+  }
+  $('#map-loading').hidden = true;
+  return false;
+ }
+ if (request !== layerRequest || googleFailed) return false;
+ if (layer === 'photo' && photoUnavailable) return setLayer('styled');
+ const view = mapView();
+ if (layer === 'photo') {
+  setTraffic(false);
+  movePhotoCamera(view);
+ } else {
+  map.setMapTypeId(layer === 'satellite' ? 'satellite' : 'roadmap');
+  map.moveCamera({ ...view, tilt: layer === 'styled' ? neighborhoodTilt : 0 });
+ }
  mapLayer = layer;
- map.setMapTypeId(layer === 'satellite' ? 'satellite' : 'roadmap');
- const zoom = map.getZoom() ?? neighborhoodZoom;
- map.moveCamera({ tilt: layer === '3d' ? neighborhoodTilt : 0, heading: 0,
-  zoom: layer === '3d' ? Math.max(zoom, neighborhoodZoom) : zoom });
+ showMapSurface();
+ updateNorth();
+ $('#map-loading').hidden = true;
+ setMapControls(true);
  document.querySelectorAll('[data-layer]').forEach(button => {
   button.setAttribute('aria-pressed', String(button.dataset.layer === layer));
  });
- closeLayers();
+ renderMarkers();
+ renderWalk();
+ renderDetail();
+ return true;
 }
-document.addEventListener('click',e=>{const view=e.target.closest('[data-view]');if(view)setView(view.dataset.view);const cat=e.target.closest('[data-category]');if(cat){state.category=cat.dataset.category;state.selected=null;render();if(state.view!=='saved'&&!state.area.id)loadNearby();}const p=e.target.closest('[data-place]');if(p){const place=visiblePlaces().find(x=>x.id===p.dataset.place);if(place)selectPlace(place);}const save=e.target.closest('[data-save]');if(save)toggleSave(save.dataset.save);if(e.target.closest('[data-start-tour]'))startTour();if(e.target.closest('#detail-close')){state.selected=null;render();}if(e.target.closest('#tour-close'))endTour();const stop=e.target.closest('[data-stop]');if(stop)tourStep(Number(stop.dataset.stop));if(e.target.closest('[data-tour-prev]'))tourStep(state.tour.index-1);if(e.target.closest('[data-tour-next]'))tourStep(state.tour.index+1);if(e.target.closest('#retry-places'))loadNearby();const layer=e.target.closest('[data-layer]');if(layer)setLayer(layer.dataset.layer);});
+
+function setTraffic(enabled) {
+ traffic?.setMap(enabled ? map : null);
+ $('#traffic-toggle').setAttribute('aria-pressed', String(enabled));
+ $('#traffic-status').hidden = !enabled;
+}
+document.addEventListener('click',e=>{const view=e.target.closest('[data-view]');if(view)setView(view.dataset.view);const cat=e.target.closest('[data-category]');if(cat){state.category=cat.dataset.category;state.selected=null;render();if(state.view!=='saved'&&!state.area.id)loadNearby();}const p=e.target.closest('[data-place]');if(p){const place=visiblePlaces().find(x=>x.id===p.dataset.place);if(place)selectPlace(place);}const save=e.target.closest('[data-save]');if(save)toggleSave(save.dataset.save);if(e.target.closest('[data-start-tour]'))startTour();if(e.target.closest('#detail-close')){state.selected=null;render();}if(e.target.closest('#tour-close'))endTour();const stop=e.target.closest('[data-stop]');if(stop)tourStep(Number(stop.dataset.stop));if(e.target.closest('[data-tour-prev]'))tourStep(state.tour.index-1);if(e.target.closest('[data-tour-next]'))tourStep(state.tour.index+1);if(e.target.closest('#retry-places'))loadNearby();const layer=e.target.closest('[data-layer]');if(layer){closeLayers();setLayer(layer.dataset.layer);}});
 $('#search-form').onsubmit=e=>{e.preventDefault();const q=$('#location-search').value.trim();if(q)searchLocation(q);};
 $('#detail-card').addEventListener('click',event=>{
  const button=event.target.closest('[data-open-street]');
@@ -316,8 +578,8 @@ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('di
 $('#search-instead').onclick=()=>{$('#neighborhood-dialog').close();$('#location-search').focus();};
 $('#neighborhood-options').innerHTML=neighborhoods.map(a=>`<button class="neighborhood-option" data-area="${a.id}"><img src="assets/${a.image}" alt="${esc(a.alt)}"><span><strong>${esc(a.name)}</strong><small>${esc(a.vibe)}</small></span></button>`).join('');$('#neighborhood-options').onclick=e=>{const a=e.target.closest('[data-area]');if(a){$('#neighborhood-dialog').close();loadLocation(neighborhoods.find(n=>n.id===a.dataset.area));}};
 $('#recenter-button').onclick=()=>{panTo(state.center);$('#search-area').hidden=true;};
-$('#zoom-in').onclick=()=>{if(map)map.setZoom((map.getZoom() ?? neighborhoodZoom) + 1);};
-$('#zoom-out').onclick=()=>{if(map)map.setZoom((map.getZoom() ?? neighborhoodZoom) - 1);};
+$('#zoom-in').onclick=()=>zoomMap(1);
+$('#zoom-out').onclick=()=>zoomMap(-1);
 $('#street-view-button').onclick=event=>openStreetView(mapCenter(),event.currentTarget);
 $('#street-view-back').onclick=()=>{
  closeStreetView();
@@ -330,7 +592,8 @@ $('.map-section').insertAdjacentHTML('beforeend',`
  <div class="layer-control">
   <button id="layers-button" class="map-control" aria-label="Choose map layer" aria-expanded="false" disabled>${icon('layers')}</button>
   <div id="layer-options" class="layer-options" hidden>
-   <button data-layer="3d" aria-pressed="true">3D buildings</button>
+   <button data-layer="photo" aria-pressed="false">Photorealistic 3D</button>
+   <button data-layer="styled" aria-pressed="false">Styled map</button>
    <button data-layer="flat" aria-pressed="false">Flat map</button>
    <button data-layer="satellite" aria-pressed="false">Satellite</button>
    <button id="traffic-toggle" type="button" aria-pressed="false">Live traffic</button>
@@ -342,13 +605,13 @@ $('#layers-button').onclick=()=>{
  options.hidden=!options.hidden;
  $('#layers-button').setAttribute('aria-expanded',String(!options.hidden));
 };
-$('#traffic-toggle').onclick=event=>{
- if(!map) return;
- const enabled = !traffic.getMap();
- traffic.setMap(enabled ? map : null);
- event.currentTarget.setAttribute('aria-pressed', String(enabled));
- $('#traffic-status').hidden = !enabled;
+$('#traffic-toggle').onclick=async()=>{
  closeLayers();
+ const fromPhoto = mapLayer === 'photo';
+ if (fromPhoto && !(await setLayer('styled'))) return;
+ if (!mapLayer || mapLayer === 'photo') return;
+ setTraffic(!traffic.getMap());
+ if (fromPhoto) toast('Live traffic is shown on the styled map.');
 };
 fetch('assets/photo-credits.json').then(r=>r.json()).then(d=>{$('#photo-credits').innerHTML='Neighborhood photographs (cropped to fit):<br>'+d.assets.map(a=>`<a href="${safeUrl(a.sourcePage)}" target="_blank" rel="noopener noreferrer">${esc(a.neighborhood)}</a>: ${esc(a.author)} · <a href="${safeUrl(a.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(a.license)}</a>`).join('<br>');}).catch(()=>{});
 icons();render();

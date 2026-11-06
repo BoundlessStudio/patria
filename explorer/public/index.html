@@ -76,7 +76,13 @@
       <footer class="panel-footer"><span data-icon="globe"></span><span id="data-note">Curated Toronto collection</span><button id="sources-button">About our places</button></footer>
     </aside>
     <section class="map-section" aria-label="Neighborhood map">
-      <div id="map" role="region" aria-label="Interactive map of neighborhood places"></div>
+      <div id="map" role="region" aria-label="Interactive map of neighborhood places">
+        <div id="map-photo" class="map-surface" inert>
+          <div id="photo-loading" class="map-loading" role="status">Loading 3D imagery…</div>
+        </div>
+        <div id="map-standard" class="map-surface" inert></div>
+      </div>
+      <div id="map-loading" class="map-loading" role="status">Loading the neighborhood map…</div>
       <div class="map-top"><div class="map-heading"><span class="map-heading-icon" data-icon="compass"></span><div><span class="map-eyebrow">YOUR NEIGHBORHOOD, A LITTLE CLOSER</span><h2 id="map-title">Kensington Market</h2></div></div><button class="map-control" id="recenter-button" aria-label="Recenter map" title="Recenter map" disabled><span data-icon="locate"></span></button></div>
       <div id="map-error" class="map-error" role="status" hidden><span></span> <a href="/setup">Map setup</a></div>
       <a id="traffic-status" class="traffic-status" href="/setup#traffic" target="_blank" rel="noopener noreferrer" hidden>Live traffic · Google Maps</a>
