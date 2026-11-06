@@ -1,0 +1,40 @@
+# Patria build plan for Canadian cities
+
+Build a neighbourhood explorer that starts from a city, neighbourhood, address, current location, or point on the map. A person should be able to find places near that point and turn them into a walk using the same flow across Canada. Use the three Toronto collections as explicit homepage examples and guest previews.
+
+Implement the phases in order. Phase 1 is the first delivery milestone and should work independently of the walk planner.
+
+Patria already has a MapLibre map, Photon search and nearby places, a suggested-stop tour, and a two-point pedestrian preview using OSRM. Extend the existing static frontend and Worker. Use the current Sites sign-in boundary for live search and nearby places. [Explorer README](../README.md), [Worker API](../worker/api.mjs), [Walk preview](../public/walk-preview.js)
+
+## Phase 1 Find a starting point and explore nearby
+
+1. Make **Explore near me** the main homepage action and send it to `/explore` through the existing sign-in flow. On a first visit, show the starting-point choices without preselecting Toronto. Restore a valid saved starting point on return. Keep preferences accessible from the account menu and the three samples reachable through `/preview?area=…`. The local preview and its onboarding preview should still work.
+2. Give the explorer a single set of starting-point controls for text search, **Use my location**, and choosing the map centre at neighbourhood zoom. Request location permission only on a button press. If permission is denied, leave search and map selection available. Use the existing **Search this area** interaction for the map option.
+3. Use the same Canadian search behaviour in the explorer and onboarding. Have both request `country=CA` on `/api/search` and forward it as Photon's `countrycode=CA` filter. Keep requests that omit `country` compatible. Include the municipality and province or territory in result labels where available, with the existing formatted address as a fallback. Keep accented and unaccented queries working. [Photon search parameters](https://github.com/komoot/photon/blob/master/docs/api-v1.md#search)
+4. Use the existing categories, place IDs, and attribution for nearby results. Start at the current 1.2 km radius and offer 2.5 km, then 5 km, if there are fewer than three matching places. Pass the selected radius as an optional, validated preset to `/api/nearby`. Keep the current category when widening. Give a successful empty result a widen or change-category action. Give a lookup error a retry for the same location, category, and radius. A response for an older selection must never replace the current results.
+
+**Acceptance.** A new signed-in visitor can choose a Canadian starting point and see nearby places without completing the preferences wizard. `London` finds London, Ontario through the default search. The map and list respond to a changed start or category, a denied location request leaves a working search, and a sparse result and a provider failure show different actions. The homepage examples open as a guest and existing bookmarks and profiles load.
+
+## Phase 2 Plan a walk that fits the available time
+
+1. For a live starting point, add **Plan a walk** with 15, 30, and 60 minute options and a **Return to start** toggle. Suggest up to four distinct nearby places from the current results, with at least one destination. Order the initial candidate by proximity and respect the selected category. Let the user remove or replace a stop from the nearby list and recalculate.
+2. Extend the existing `/api/walk` contract to accept an ordered waypoint list for signed-in plans. Keep its public two-point request and response compatible. Use the existing `PATRIA_WALK_ROUTER_URL` foot routing configuration. Validate the number and coordinates of stops, adjacent point separation, and the route distance bounds. Allow matching start and end points for a loop with a valid intermediate stop. Request one route per deliberate action and reuse the existing cache and throttling. [OSRM route API](https://project-osrm.org/docs/v5.24.0/api/#route-service)
+3. Draw the returned pedestrian geometry and show the routed distance and estimated walking time for the entire itinerary, including the return leg for loops. Label an over-budget route with its actual estimate and offer to remove a stop or choose more time. If there is no connected route, let the user revise the stops or return to nearby places. Keep the draft available after a service error and ignore route responses superseded by a location or stop change.
+4. Reuse the tour controls for the ordered stops and the existing directions handoff for the next leg. Keep the next stop and its directions visible together on mobile. Put the existing **Preview a walk** tool in reach for a person who wants to choose two points directly.
+
+**Acceptance.** A visitor can plan from a live Canadian starting point, switch between one-way and loop routes, and replace a stop. The displayed line, distance, time, and stop order agree with the router response. The route includes the return leg when selected. An over-budget route is identified, and a missing route or upstream error leaves a useful next action. The original two-point preview still runs.
+
+## Phase 3 Save share and resume walks
+
+1. Save the ordered itinerary and current stop in versioned browser storage scoped to the current user or guest. Restore a saved walk after reload and after returning from directions. Finishing clears active progress and keeps a saved itinerary available. If storage is unavailable, keep the walk usable for the current visit.
+2. Add **Copy walk link**. A public link opens a read-only itinerary in the guest preview, with the same public stops in order and directions between them. Start the shared version at the first mapped stop and return there for a loop. Put a versioned, bounded payload in the URL fragment and include only public stop labels and coordinates, plus the loop choice. Show the share start before copying. For a walk with a single public stop, open it as a destination. Render the guest itinerary from the link payload with its stop list, map pins, and directions links.
+3. Validate the payload before rendering. For an invalid or unsupported link, show a short message and a way to open the explorer or a sample walk.
+
+**Acceptance.** Starting a walk, advancing a stop, and refreshing restores the same itinerary and stop on that browser. A fresh guest browser opens a copied link with the public stops in order, including when the sender started at a personal address or used their location. Invalid links and blocked browser storage leave the app usable.
+
+## Release checks
+
+- Run `npm test` and `npm run build` from `explorer/`. Use mocked provider responses for deterministic tests of country filtering, radius validation, ordered waypoints, loops, request limits, and unavailable routes. Test the signed-in UI with a test identity or controlled browser fixtures and check guest previews in a fresh session.
+- Walk through the flow on desktop and at phone width. Include a rapid category or location change, location permission denied, a slow request, a sparse result, and a route that exceeds the requested time. Use a second browser context to verify a share link.
+- Spot-check live search and nearby discovery in Nanaimo, Saskatoon, London, Old Québec, St. John’s, and Yellowknife. Include a suburban or sparse starting point and an accented and unaccented French query. Record whether each test found the right start, returned nearby places, and produced a pedestrian route where expected. Use these checks to decide where to expand the pilot.
+- Configure `PATRIA_PHOTON_URL` and `PATRIA_WALK_ROUTER_URL` with capacity for the intended rollout. Photon describes its public endpoint as a demo and FOSSGIS limits its public router to one request per second. Use fixtures for repeated checks. [Photon demo policy](https://github.com/komoot/photon#demo-server), [FOSSGIS usage policy](https://routing.openstreetmap.de/about.html)

@@ -1,0 +1,7 @@
+.playwright-mcp/
+/artifacts/
+/tmp/
+node_modules/
+.env
+.env.*
+!.env.example

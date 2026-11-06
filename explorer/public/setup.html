@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>Map sources — Patria</title>
+ <link rel="stylesheet" href="styles.css">
+ <style>main{max-width:700px;padding:50px 25px;margin:auto}p{line-height:1.8;color:#6c7c77}</style>
+</head>
+<body>
+ <main>
+  <a class="brand" href="/">patria<span class="brand-period">.</span></a>
+  <h1>Map sources</h1>
+  <p>Patria uses <a href="https://www.openstreetmap.org/copyright">OpenStreetMap data</a> for streets, buildings, and nearby places. <a href="https://openfreemap.org/">OpenFreeMap</a> serves the map and <a href="https://github.com/komoot/photon">Photon</a> handles place search. The map loads without an API key.</p>
+  <p>Sign in on the hosted site to search and discover nearby places. Walk previews follow foot routes from <a href="https://routing.openstreetmap.de/about.html">FOSSGIS</a>. Satellite imagery and external walking directions open in Google Maps.</p>
+  <p>Street-level walks draw stylized bike racks, bins, and transit stop poles from mapped OpenStreetMap features. Sidewalk and curb styling takes cues from <a href="https://commons.wikimedia.org/wiki/File:Looking_south_down_Kensington_Avenue,_Toronto_2026.jpg">Chicken4War’s Kensington Avenue photograph</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>). Sidewalk widths are illustrative.</p>
+  <h2 id="traffic">Animated traffic</h2>
+  <p>At close zoom, Patria simulates cars, streetcars, trains, and ferries along mapped OpenStreetMap routes. Car density uses published average daily volumes on matched roads and road-class estimates elsewhere. Train and ferry timing is illustrative.</p>
+  <ul>
+   <li><a href="https://open.toronto.ca/dataset/traffic-volumes-midblock-vehicle-speed-volume-and-classification-counts/">Toronto midblock traffic counts</a>. Contains information licensed under the <a href="https://open.toronto.ca/open-data-licence/">Open Government Licence – Toronto</a>.</li>
+   <li><a href="https://data.calgary.ca/d/cauu-7hnw">Calgary 2024 traffic volumes</a>. Contains information licensed under the <a href="https://data.calgary.ca/stories/s/u45n-7awa/">Open Government Licence – City of Calgary</a>.</li>
+   <li><a href="https://www.donneesquebec.ca/recherche/dataset/debit-de-circulation">Québec MTMD traffic volumes</a> for selected urban corridors. The line data is sampled for the simulation under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</li>
+  </ul>
+  <a href="/preview">Open the explorer preview</a>
+ </main>
+</body>
+</html>

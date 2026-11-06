@@ -1,0 +1,47 @@
+{
+  "assets": [
+    {
+      "neighborhood": "Kensington Market",
+      "filename": "kensington-market.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Kensington_Market_in_Toronto,_June_24_2026_(05).jpg",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Kensington_Market_in_Toronto%2C_June_24_2026_%2805%29.jpg/1280px-Kensington_Market_in_Toronto%2C_June_24_2026_%2805%29.jpg",
+      "width": 1280,
+      "height": 853,
+      "author": "Dillan Payne",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attribution": "Kensington Avenue photograph by Dillan Payne / Wikimedia Commons, CC BY-SA 4.0.",
+      "alt": "Shops and pedestrians along Kensington Avenue in Toronto's Kensington Market.",
+      "visualNotes": "Natural daytime street scene. Best object-position: center 55%; cropping to 16:9 will retain storefronts and street."
+    },
+    {
+      "neighborhood": "Trinity Bellwoods",
+      "filename": "trinity-bellwoods.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Trinity_Bellwoods_Park_2022.jpg",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Trinity_Bellwoods_Park_2022.jpg/1280px-Trinity_Bellwoods_Park_2022.jpg",
+      "width": 1280,
+      "height": 960,
+      "author": "Canmenwalker",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Trinity Bellwoods Park photograph by Canmenwalker / Wikimedia Commons, CC BY 4.0.",
+      "alt": "A green field and walking paths in Trinity Bellwoods Park, with Toronto's CN Tower in the distance.",
+      "visualNotes": "Early spring grass and trees, wide open park bowl and CN Tower. Use object-position: center 58% for 16:9."
+    },
+    {
+      "neighborhood": "Distillery District",
+      "filename": "distillery-district.webp",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Toronto_distillery.png",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Toronto_distillery.png/1280px-Toronto_distillery.png",
+      "width": 1280,
+      "height": 960,
+      "author": "Bpp88520",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attribution": "Distillery District photograph by Bpp88520 / Wikimedia Commons, CC0.",
+      "alt": "Visitors walking on a brick pedestrian lane between heritage buildings in Toronto's Distillery District.",
+      "visualNotes": "Warm summer pedestrian brick scene with string lights, no watermark. Use object-position: center 60% for 16:9."
+    }
+  ],
+  "note": "Keep attribution visible in photo credits. If cropping/adapting CC BY-SA asset, indicate the change and license the adaptation under CC BY-SA 4.0."
+}

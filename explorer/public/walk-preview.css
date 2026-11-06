@@ -1,0 +1,297 @@
+.walk-preview-launch {
+  position: absolute;
+  z-index: 440;
+  left: 26px;
+  bottom: 35px;
+}
+
+.traffic-status {
+  position: absolute;
+  left: 26px;
+  bottom: 88px;
+  z-index: 435;
+  max-width: calc(100% - 52px);
+  padding: 6px 10px;
+  border: 1px solid #69665b;
+  border-radius: 6px;
+  background: #22282ef5;
+  color: #fff0d7;
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.traffic-status:hover { text-decoration: underline; }
+
+.map-section:is([data-walk-mode="street"], [data-walk-mode="overview"]) .traffic-status {
+  top: 94px;
+  bottom: auto;
+}
+
+.walk-preview-launch:disabled,
+.map-section[data-walk-mode] .walk-preview-launch,
+.map-section:has(.tour-card:not([hidden])) .walk-preview-launch,
+.map-section[data-walk-mode] :is(.detail-card, .tour-card, .search-area) {
+  display: none;
+}
+
+.detail-walk-button {
+  width: 100%;
+  justify-content: center;
+}
+
+.walk-planner,
+.walk-pick-hint,
+.walk-transport,
+.walk-playback-heading {
+  position: absolute;
+  z-index: 550;
+  border: 1px solid #dfe8e0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 36px #173b3227;
+}
+
+.walk-planner {
+  left: 26px;
+  bottom: 35px;
+  width: min(350px, calc(100% - 52px));
+  padding: 20px;
+}
+
+.walk-planner h2 {
+  margin: 6px 24px 15px 0;
+  font: 750 20px/1.2 Manrope, sans-serif;
+  letter-spacing: -.4px;
+}
+
+.walk-planner fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.walk-point {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: end;
+  margin-bottom: 11px;
+}
+
+.walk-letter, #map .walk-endpoint {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: #193f3b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.walk-letter { margin-bottom: 6px; }
+
+#map .walk-endpoint {
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px #193f3b66;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.walk-point label {
+  display: grid;
+  gap: 4px;
+  color: #435b51;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.walk-point select, .walk-point button,
+.walk-pick-hint button, .walk-playback-heading button, .walk-transport-buttons button:not(.dark-button) {
+  min-height: 40px;
+  border: 1px solid #dfe8e0;
+  border-radius: 7px;
+  background: #f5f8f4;
+  color: #193f3b;
+  font: 650 12px var(--font);
+}
+
+.walk-point select { width: 100%; padding: 0 7px; }
+.walk-point button, .walk-pick-hint button, .walk-playback-heading button, .walk-transport-buttons button { padding: 0 10px; }
+.walk-start { width: 100%; justify-content: center; margin-top: 3px; }
+
+.walk-status {
+  margin: 9px 0 0;
+  color: #73523d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.walk-status:empty { margin: 0; }
+
+.walk-pick-hint {
+  left: 50%;
+  bottom: 35px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 34px);
+  padding: 7px 10px 7px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.map-section[data-walk-mode="picking"] .maplibregl-canvas { cursor: crosshair; }
+.map-section[data-walk-mode="street"] {
+  background:
+    radial-gradient(ellipse at 16% 25%, #ffd492a8, transparent 45%),
+    linear-gradient(180deg, #54576e 0%, #9b7881 31%, #c69a82 62%, #73675e 100%);
+}
+
+.map-section:is([data-walk-mode="street"], [data-walk-mode="overview"])
+  :is(.map-top, .map-legend, .map-tools, .map-north, .layer-control, #map .map-pin, #map .map-origin),
+.map-section[data-walk-mode="street"] :is(#map .walk-endpoint, #map .walk-position),
+.map-section[data-walk-mode="overview"] .walk-look-help {
+  display: none;
+}
+
+.walk-playback-heading {
+  top: 24px;
+  left: 26px;
+  right: 26px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 9px;
+}
+
+.walk-route-heading { text-align: center; }
+
+.walk-route-heading h2 {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 750 15px/1.25 Manrope, sans-serif;
+}
+
+.walk-route-heading p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #50675b;
+}
+
+.walk-look {
+  position: absolute;
+  inset: 0 0 22px;
+  z-index: 410;
+  cursor: grab;
+  touch-action: none;
+}
+
+.walk-look:active { cursor: grabbing; }
+.walk-look:focus-visible { outline: 2px solid #193f3b; outline-offset: -3px; }
+
+.walk-transport {
+  left: 50%;
+  bottom: 31px;
+  transform: translateX(-50%);
+  width: min(398px, calc(100% - 34px));
+  padding: 12px 15px 9px;
+}
+
+.walk-transport-caption, .walk-credits {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  color: #50675b;
+  font-size: 11px;
+}
+
+.walk-transport-caption { font-weight: 650; }
+.walk-transport input { display: block; width: 100%; margin: 4px 0 6px; accent-color: #193f3b; cursor: pointer; }
+
+.walk-transport-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  gap: 7px;
+}
+
+.walk-transport-buttons .dark-button { justify-content: center; }
+.walk-credits { margin-top: 7px; font-size: 10px; }
+
+#map .walk-position {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #d08c47;
+  box-shadow: 0 0 0 2px #f3b36375;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.map-section .map-top { border-color: transparent; }
+.map-section .map-heading,
+.map-section .map-legend,
+.map-section .map-control,
+.map-section .map-tools button {
+  background: #22282ef0;
+  color: #f4efe3;
+  border-color: #555955;
+}
+
+.map-section .map-heading-icon {
+  color: #ead5aa;
+  background: #3a403d;
+}
+
+.map-section .map-eyebrow { color: #c3c9b7; }
+.map-section .map-north { color: #fff6e5; text-shadow: 0 1px 4px #1f2627; }
+.map-section .legend-pin { background: #8fb5a0; }
+.map-section .legend-center { background: #cb9f60; }
+
+.walk-playback-heading, .walk-transport {
+  background: #25262cf2;
+  color: #fff4e0;
+  border-color: #716557;
+  box-shadow: 0 8px 30px #211b2580;
+}
+
+.walk-playback-heading button, .walk-transport-buttons button:not(.dark-button) {
+  color: #fff0d7;
+  border-color: #6b6057;
+  background: #3c383a;
+}
+
+.walk-route-heading p, .walk-transport-caption, .walk-credits { color: #e2cfb1; }
+.walk-transport input { accent-color: #e3aa68; }
+.walk-transport-buttons .dark-button {
+  background: #edb979;
+  color: #302720;
+}
+
+@media (max-width: 1100px) {
+  .map-section:has(.detail-card:not([hidden])) .walk-preview-launch { display: none; }
+}
+
+@media (max-width: 720px) {
+  .walk-preview-launch, .walk-planner { left: 17px; bottom: 27px; }
+  .walk-planner { width: min(350px, calc(100% - 34px)); padding: 17px; }
+  .walk-playback-heading {
+    top: 16px;
+    left: 17px;
+    right: 17px;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .walk-route-heading { order: 1; grid-column: 1 / -1; padding: 3px 0; }
+  .walk-transport { bottom: 26px; }
+  .traffic-status { left: 17px; bottom: 80px; max-width: calc(100% - 34px); }
+  .map-section:is([data-walk-mode="street"], [data-walk-mode="overview"]) .traffic-status { top: 132px; bottom: auto; }
+}

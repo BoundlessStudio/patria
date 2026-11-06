@@ -1,0 +1,2139 @@
+{
+  "schemaVersion": 1,
+  "country": "CA",
+  "verifiedOn": "2026-11-06",
+  "purpose": "Seed registry for Patria's Canadian experience discovery. Coverage labels describe publishers' markets; they are not spatial filters.",
+  "discoveryDefaults": {
+    "radiusMeters": 1200,
+    "dateWindowDays": 7
+  },
+  "usage": {
+    "calendars": "Use these entry points to discover new occurrences. The dated examples are verification evidence and should never be ingested as a hard-coded calendar.",
+    "access": "A public calendar or feed was observable for discovery. Follow the publisher's reuse terms before copying listings or media. Provider records with an access requirement are verified against first-party documentation.",
+    "geo": "Resolve a physical venue or meeting point for every occurrence. Apply the exact radius from the user's pin on the server. Hold records with an unresolved venue out of nearby results.",
+    "dates": "Use the venue's local timezone and actual occurrences or confirmed ongoing runs. Apply schedule exceptions, cancellations and availability updates. A date range in an example documents a run or series, not uninterrupted daily availability.",
+    "registry": "Use the same adapter for compatible publishers. Retain source URLs and publisher IDs for refresh and deduplication."
+  },
+  "sources": [
+    {
+      "id": "ticketmaster-discovery",
+      "publisher": "Ticketmaster Discovery Feed and API",
+      "region": "multi",
+      "coverage": "Canada",
+      "category": "ticketing",
+      "url": "https://developer.ticketmaster.com/products-and-docs/apis/discovery-feed/",
+      "ingest": {
+        "adapter": "ticketmaster-discovery",
+        "access": "developer-key",
+        "endpoints": [
+          "https://app.ticketmaster.com/discovery-feed/v2/events.json",
+          "https://app.ticketmaster.com/discovery/v2/events.json"
+        ],
+        "conditions": "Register for a developer key and follow Ticketmaster's display and retention terms."
+      },
+      "venueResolution": "Use the event's venue coordinates from the detailed feed or API and apply Patria's own distance check.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/",
+        "evidence": "Canada country file; search by geohash, radius and date. Event records link to venues with coordinates and carry event dates and status."
+      }
+    },
+    {
+      "id": "has-things",
+      "publisher": "Has Things",
+      "region": "multi",
+      "coverage": "Supported Canadian cities",
+      "category": "aggregator",
+      "url": "https://halifax.hasthings.com/feeds",
+      "ingest": {
+        "adapter": "has-things",
+        "access": "public-feed",
+        "endpoints": [
+          "https://halifax.hasthings.com/api/events",
+          "https://halifax.hasthings.com/api/venues"
+        ],
+        "conditions": "Supported city hosts use the same endpoints. The published listing metadata is ODbL 1.0; account for attribution and share-alike when combining it with other sources."
+      },
+      "venueResolution": "Join event.venue.slug to the city venue catalog. Require a confirmed physical venue and deduplicate records across providers.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://halifax.hasthings.com/feeds",
+        "evidence": "The public city feeds expose dated showtimes and statuses. The venue endpoint returns coordinates; the sampled Canadian feeds join on venue slug."
+      }
+    },
+    {
+      "id": "allevents",
+      "publisher": "AllEvents Data API",
+      "region": "multi",
+      "coverage": "Canada and international",
+      "category": "aggregator",
+      "url": "https://allevents.in/pages/events-api",
+      "ingest": {
+        "adapter": "allevents",
+        "access": "commercial-agreement",
+        "conditions": "Obtain API access and rights to display the chosen metadata. Validate dated, in-radius yield from the actual contracted endpoint."
+      },
+      "venueResolution": "Request venue-address and coordinate fields in a Canadian sample and validate them before including any event.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://allevents.in/pages/events-api",
+        "evidence": "The vendor advertises event data by date and geographic coordinates. Its developer portal documents a radius search on request."
+      }
+    },
+    {
+      "id": "predicthq",
+      "publisher": "PredictHQ Events API",
+      "region": "multi",
+      "coverage": "Canada and international",
+      "category": "aggregator",
+      "url": "https://docs.predicthq.com/api/events/search-events",
+      "ingest": {
+        "adapter": "predicthq",
+        "access": "commercial-agreement",
+        "endpoints": [
+          "https://api.predicthq.com/v1/events/"
+        ],
+        "conditions": "Use an agreement that expressly covers public display and any retention Patria needs."
+      },
+      "venueResolution": "Require a public, attendable event with a resolved venue. Area-wide events and point centroids do not pass venue validation.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://docs.predicthq.com/api/events/search-events",
+        "evidence": "The Events API documents radial search, start and end date filters, update/status fields and event geography."
+      }
+    },
+    {
+      "id": "jambase",
+      "publisher": "JamBase Concert Data API",
+      "region": "multi",
+      "coverage": "Canada and international",
+      "category": "music",
+      "url": "https://data.jambase.com/faq",
+      "ingest": {
+        "adapter": "jambase",
+        "access": "commercial-agreement",
+        "endpoints": [
+          "https://api.data.jambase.com/v3/events"
+        ],
+        "conditions": "Use the evaluation tier for testing and a commercial plan for product use. Apply updates and removals to stored records."
+      },
+      "venueResolution": "Resolve the concert's venue address or coordinates and filter by Patria's radius.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://data.jambase.com/faq",
+        "evidence": "The API documents concerts and festivals by date, country or latitude and longitude with radius. Canadian concert listings are public on JamBase."
+      }
+    },
+    {
+      "id": "viator",
+      "publisher": "Viator Partner API",
+      "region": "multi",
+      "coverage": "Canadian destinations with product inventory",
+      "category": "bookable",
+      "url": "https://docs.viator.com/partner-api/",
+      "ingest": {
+        "adapter": "viator",
+        "access": "partner-agreement",
+        "conditions": "Endpoint access varies by partner tier. Confirm both the needed availability endpoints and display rights."
+      },
+      "venueResolution": "Resolve the actual meeting point for the bookable option. Use that point and an available date instead of the destination label.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://docs.viator.com/partner-api/technical/",
+        "evidence": "Availability schedules supply dated tour and activity inventory. Product logistics can include a meeting-point location reference."
+      }
+    },
+    {
+      "id": "mindbody",
+      "publisher": "Mindbody Affiliate API",
+      "region": "multi",
+      "coverage": "Participating Canadian studios",
+      "category": "bookable",
+      "url": "https://developers.mindbodyonline.com/AffiliateDocumentation",
+      "ingest": {
+        "adapter": "mindbody-affiliate",
+        "access": "partner-agreement",
+        "conditions": "Confirm Affiliate API access and participating Canadian studio inventory."
+      },
+      "venueResolution": "Join each dated class to its physical studio location. Filter by the studio's returned coordinates.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://developers.mindbodyonline.com/AffiliateDocumentation",
+        "evidence": "Affiliate documentation shows location search by point and radius, plus dated class searches for a location."
+      }
+    },
+    {
+      "id": "showpass",
+      "publisher": "Showpass Organizer Discovery API",
+      "region": "multi",
+      "coverage": "Participating Canadian organizers",
+      "category": "ticketing",
+      "url": "https://dev.showpass.com/api/public-api-event-list-by-organization/",
+      "ingest": {
+        "adapter": "showpass-organizer",
+        "access": "organizer-approval",
+        "endpoints": [
+          "https://www.showpass.com/api/public/discovery/"
+        ],
+        "conditions": "The documented setup needs participating organization IDs and domain whitelisting."
+      },
+      "venueResolution": "Resolve the listing's venue and keep each dated recurrence separate.",
+      "verification": {
+        "kind": "provider-documentation",
+        "url": "https://dev.showpass.com/api/public-api-event-list-by-organization/",
+        "evidence": "The discovery endpoint lists public experiences for supplied organization IDs; only_parents=false includes recurring instances."
+      }
+    },
+    {
+      "id": "vancouver-library",
+      "publisher": "Vancouver Public Library",
+      "region": "BC",
+      "coverage": "Vancouver",
+      "category": "library",
+      "url": "https://vpl.bibliocommons.com/v2/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "BiblioCommons"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Live Music at VPL",
+        "venue": "Vancouver Public Library Central Library",
+        "url": "https://vpl.bibliocommons.com/v2/events?locations=CEN&page=2"
+      }
+    },
+    {
+      "id": "the-cultch",
+      "publisher": "The Cultch",
+      "region": "BC",
+      "coverage": "Vancouver",
+      "category": "performance",
+      "url": "https://thecultch.com/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-18",
+        "endsOn": "2027-01-10",
+        "title": "East Van Panto: Hercules",
+        "venue": "York Theatre",
+        "url": "https://thecultch.com/whats-on/"
+      }
+    },
+    {
+      "id": "science-world",
+      "publisher": "Science World",
+      "region": "BC",
+      "coverage": "Vancouver",
+      "category": "science",
+      "url": "https://www.scienceworld.ca/today/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Sensory-Friendly Mornings",
+        "venue": "Science World",
+        "url": "https://www.scienceworld.ca/event/sensory-friendly-morning/"
+      }
+    },
+    {
+      "id": "vancouver-art-gallery",
+      "publisher": "Vancouver Art Gallery",
+      "region": "BC",
+      "coverage": "Vancouver",
+      "category": "visual-arts",
+      "url": "https://www.vanartgallery.bc.ca/exhibitions/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-08-07",
+        "endsOn": "2026-11-22",
+        "title": "Vancouver Now! Emily Hermant",
+        "venue": "Vancouver Art Gallery",
+        "url": "https://www.vanartgallery.bc.ca/exhibitions/"
+      }
+    },
+    {
+      "id": "aggv",
+      "publisher": "Art Gallery of Greater Victoria",
+      "region": "BC",
+      "coverage": "Victoria",
+      "category": "visual-arts",
+      "url": "https://aggv.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Winter Exhibition Celebration",
+        "venue": "Art Gallery of Greater Victoria",
+        "url": "https://aggv.ca/"
+      }
+    },
+    {
+      "id": "gvpl",
+      "publisher": "Greater Victoria Public Library",
+      "region": "BC",
+      "coverage": "Greater Victoria",
+      "category": "library",
+      "url": "https://events.gvpl.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Libnet public calendar"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Family Storytime with Stay & Play",
+        "venue": "sxʷeŋxʷəŋ təŋəxʷ James Bay branch",
+        "url": "https://events.gvpl.ca/"
+      }
+    },
+    {
+      "id": "nanaimo-museum",
+      "publisher": "Nanaimo Museum",
+      "region": "BC",
+      "coverage": "Nanaimo",
+      "category": "museum",
+      "url": "https://nanaimomuseum.ca/whats-happening/events-presentations/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "A Glimpse of India: Diwali Celebration",
+        "venue": "Nanaimo Museum",
+        "url": "https://nanaimomuseum.ca/events/diwali-market-2026/"
+      }
+    },
+    {
+      "id": "virl",
+      "publisher": "Vancouver Island Regional Library",
+      "region": "BC",
+      "coverage": "Vancouver Island and other coastal communities",
+      "category": "library",
+      "url": "https://virl.bc.ca/calendar/list/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "The Events Calendar markup"
+        ],
+        "note": "Resolve the branch from each occurrence. Expand the recurrence with the local branch timezone and apply exceptions."
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-10",
+        "title": "Family Storytime",
+        "venue": "Bowser branch",
+        "url": "https://virl.bc.ca/event/family-storytime-2/all/"
+      }
+    },
+    {
+      "id": "rotary-centre-arts",
+      "publisher": "Rotary Centre for the Arts",
+      "region": "BC",
+      "coverage": "Kelowna",
+      "category": "performance",
+      "url": "https://rotarycentreforthearts.com/events/guest-events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Harmony Radio After Dark",
+        "venue": "Mary Irwin Theatre",
+        "url": "https://rotarycentreforthearts.com/events/event/harmonyradio26"
+      }
+    },
+    {
+      "id": "kamloops-art-gallery",
+      "publisher": "Kamloops Art Gallery",
+      "region": "BC",
+      "coverage": "Kamloops",
+      "category": "visual-arts",
+      "url": "https://kag.bc.ca/current",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-09-19",
+        "endsOn": "2027-01-09",
+        "title": "In the rear-view mirror",
+        "venue": "The Cube at Kamloops Art Gallery",
+        "url": "https://kag.bc.ca/current"
+      }
+    },
+    {
+      "id": "two-rivers-gallery",
+      "publisher": "Two Rivers Gallery",
+      "region": "BC",
+      "coverage": "Prince George",
+      "category": "visual-arts",
+      "url": "https://tworiversgallery.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-10-30",
+        "endsOn": "2027-01-17",
+        "title": "White Noise",
+        "venue": "Two Rivers Gallery Main Gallery",
+        "url": "https://tworiversgallery.ca/"
+      }
+    },
+    {
+      "id": "regional-district-nanaimo",
+      "publisher": "Regional District of Nanaimo",
+      "region": "BC",
+      "coverage": "Nanaimo region",
+      "category": "civic",
+      "url": "https://www.rdn.ca/news-notices-events/events-calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Science in the Park – Plants and Trees",
+        "url": "https://www.rdn.ca/news-notices-events/events-calendar/science-park-plants-trees",
+        "venue": "Errington Community Park"
+      }
+    },
+    {
+      "id": "calgary-library",
+      "publisher": "Calgary Public Library",
+      "region": "AB",
+      "coverage": "Calgary",
+      "category": "library",
+      "url": "https://www.calgarylibrary.ca/events-and-programs/programs/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Open Lab",
+        "venue": "Country Hills Library",
+        "url": "https://www.calgarylibrary.ca/events-and-programs/programs/open-lab/"
+      }
+    },
+    {
+      "id": "studio-bell",
+      "publisher": "National Music Centre at Studio Bell",
+      "region": "AB",
+      "coverage": "Calgary",
+      "category": "music",
+      "url": "https://www.studiobell.ca/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Synth Soundbath",
+        "venue": "Studio Bell",
+        "url": "https://www.studiobell.ca/whats-on/event/synth-soundbath-sync-edition"
+      }
+    },
+    {
+      "id": "contemporary-calgary",
+      "publisher": "Contemporary Calgary",
+      "region": "AB",
+      "coverage": "Calgary",
+      "category": "visual-arts",
+      "url": "https://www.contemporarycalgary.com/whats-on",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-06-04",
+        "endsOn": "2026-11-08",
+        "title": "Aelita Husni Bey: Agency",
+        "venue": "Contemporary Calgary",
+        "url": "https://www.contemporarycalgary.com/whats-on"
+      }
+    },
+    {
+      "id": "edmonton-library",
+      "publisher": "Edmonton Public Library",
+      "region": "AB",
+      "coverage": "Edmonton",
+      "category": "library",
+      "url": "https://epl.bibliocommons.com/v2/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "BiblioCommons"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "The Kitchen: Macarons",
+        "venue": "Stanley A. Milner Library",
+        "url": "https://epl.bibliocommons.com/v2/events?locations=EPLMNA&startDate=2026-11-07"
+      }
+    },
+    {
+      "id": "metro-cinema",
+      "publisher": "Metro Cinema",
+      "region": "AB",
+      "coverage": "Edmonton",
+      "category": "film",
+      "url": "https://metrocinema.org/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-01",
+        "endsOn": "2026-11-30",
+        "title": "Metamorphosis",
+        "venue": "Metro Gallery at the Garneau Theatre",
+        "url": "https://metrocinema.org/metro-gallery/metamorphosis/"
+      }
+    },
+    {
+      "id": "art-gallery-alberta",
+      "publisher": "Art Gallery of Alberta",
+      "region": "AB",
+      "coverage": "Edmonton",
+      "category": "visual-arts",
+      "url": "https://www.youraga.ca/whats-on/calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "LPW x AGA: The Joy of Grappling",
+        "venue": "Art Gallery of Alberta",
+        "url": "https://www.youraga.ca/whats-on/calendar"
+      }
+    },
+    {
+      "id": "red-deer-mag",
+      "publisher": "Red Deer Museum and Art Gallery",
+      "region": "AB",
+      "coverage": "Red Deer",
+      "category": "museum",
+      "url": "https://reddeermuseum.com/events-calendar/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Make Art: Feel Better",
+        "venue": "Red Deer Museum and Art Gallery",
+        "url": "https://reddeermuseum.com/product/make-art-feel-better-november-7/"
+      }
+    },
+    {
+      "id": "banff-centre",
+      "publisher": "Banff Centre for Arts and Creativity",
+      "region": "AB",
+      "coverage": "Banff",
+      "category": "performance",
+      "url": "https://www.banffcentre.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-27",
+        "title": "Mâwacihitowinihk Nikamowak: A Gathering of Indigenous Musicians",
+        "venue": "Margaret Greenham Theatre",
+        "url": "https://www.banffcentre.ca/events?direct=true&page=1"
+      }
+    },
+    {
+      "id": "saag",
+      "publisher": "Southern Alberta Art Gallery",
+      "region": "AB",
+      "coverage": "Lethbridge",
+      "category": "visual-arts",
+      "url": "https://www.saag.ca/calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "November Gallery Crawl: Asterisms Water Ways",
+        "venue": "SAAG Acadia",
+        "url": "https://www.saag.ca/calendar/winter-gallery-hop"
+      }
+    },
+    {
+      "id": "esplanade",
+      "publisher": "Esplanade Arts and Heritage Centre",
+      "region": "AB",
+      "coverage": "Medicine Hat",
+      "category": "performance",
+      "url": "https://www.esplanade.ca/arts-performing-visual/performing-arts",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Folsom Prison concert",
+        "venue": "Esplanade Arts and Heritage Centre",
+        "url": "https://www.esplanade.ca/arts-performing-visual/performing-arts"
+      }
+    },
+    {
+      "id": "remai-modern",
+      "publisher": "Remai Modern",
+      "region": "SK",
+      "coverage": "Saskatoon",
+      "category": "visual-arts",
+      "url": "https://remaimodern.org/events-gatherings/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Youth Art Night",
+        "venue": "Cameco Learning Studio at Remai Modern",
+        "url": "https://www.remaimodern.org/events-gatherings/youth-art-night-17/2026-11-12/"
+      }
+    },
+    {
+      "id": "wanuskewin",
+      "publisher": "Wanuskewin Heritage Park",
+      "region": "SK",
+      "coverage": "Near Saskatoon",
+      "category": "heritage",
+      "url": "https://wanuskewin.com/experience/event-calendar/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "Beaded Poppy Pin Workshop",
+        "venue": "Wanuskewin Heritage Park",
+        "url": "https://wanuskewin.com/event/beaded-poppy-pin-workshop-november-2026/"
+      }
+    },
+    {
+      "id": "regina-library",
+      "publisher": "Regina Public Library",
+      "region": "SK",
+      "coverage": "Regina",
+      "category": "library",
+      "url": "https://www.reginalibrary.ca/attend/programs",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Card Making With Lori Boyd",
+        "url": "https://www.reginalibrary.ca/attend/programs/17203338"
+      }
+    },
+    {
+      "id": "mackenzie-art-gallery",
+      "publisher": "MacKenzie Art Gallery",
+      "region": "SK",
+      "coverage": "Regina",
+      "category": "visual-arts",
+      "url": "https://mackenzie.art/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-21",
+        "title": "Holiday Bazaart Makers Market",
+        "venue": "MacKenzie Art Gallery",
+        "url": "https://mackenzie.art/event/holiday-bazaart-2026/"
+      }
+    },
+    {
+      "id": "conexus-arts",
+      "publisher": "Conexus Arts Centre",
+      "region": "SK",
+      "coverage": "Regina",
+      "category": "performance",
+      "url": "https://conexusartscentre.ca/events_calendar/list/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "International Whisky Night",
+        "venue": "Conexus Arts Centre",
+        "url": "https://conexusartscentre.ca/events_calendar/list/"
+      }
+    },
+    {
+      "id": "saskculture",
+      "publisher": "SaskCulture",
+      "region": "SK",
+      "coverage": "Saskatchewan",
+      "category": "community",
+      "url": "https://www.saskculture.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-13",
+        "title": "Indigenous Perspectives: Bridging Traditions and Contemporary Art",
+        "venue": "Art Gallery of Regina",
+        "url": "https://www.saskculture.ca/events/3980"
+      }
+    },
+    {
+      "id": "winnipeg-library",
+      "publisher": "Winnipeg Public Library",
+      "region": "MB",
+      "coverage": "Winnipeg",
+      "category": "library",
+      "url": "https://wpl.libcal.com/calendar/main/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "LibCal"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-17",
+        "title": "Beyond Your Bookshelf Book Club",
+        "venue": "Bill and Helen Norrie Library",
+        "url": "https://wpl.libcal.com/event/4044861"
+      }
+    },
+    {
+      "id": "assiniboine-park",
+      "publisher": "Assiniboine Park Conservancy",
+      "region": "MB",
+      "coverage": "Winnipeg",
+      "category": "parks",
+      "url": "https://www.assiniboinepark.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Henna Tattoo Workshop",
+        "venue": "The Leaf at Assiniboine Park",
+        "url": "https://www.assiniboinepark.ca/events"
+      }
+    },
+    {
+      "id": "winnipeg-arts-council",
+      "publisher": "Winnipeg Arts Council",
+      "region": "MB",
+      "coverage": "Winnipeg",
+      "category": "community",
+      "url": "https://winnipegarts.ca/calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "First Fridays in the Exchange guided art walk",
+        "url": "https://winnipegarts.ca/calendar/event/first-fridays-in-the-exchange-39"
+      }
+    },
+    {
+      "id": "dave-barber-cinematheque",
+      "publisher": "Dave Barber Cinematheque",
+      "region": "MB",
+      "coverage": "Winnipeg",
+      "category": "film",
+      "url": "https://davebarbercinematheque.com/calendar/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Gimme Some Truth: Shorts Program 1",
+        "venue": "Dave Barber Cinematheque",
+        "url": "https://davebarbercinematheque.com/2026/10/20/november-2026-calendar/"
+      }
+    },
+    {
+      "id": "royal-mtc",
+      "publisher": "Royal Manitoba Theatre Centre",
+      "region": "MB",
+      "coverage": "Winnipeg",
+      "category": "performance",
+      "url": "https://tickets.royalmtc.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-25",
+        "endsOn": "2026-12-19",
+        "title": "Anne of Green Gables – The Musical",
+        "venue": "John Hirsch Mainstage",
+        "url": "https://royalmtc.ca/Subscriptions/John-Hirsch-Mainstage-Playbill.aspx"
+      }
+    },
+    {
+      "id": "agsm",
+      "publisher": "Art Gallery of Southwestern Manitoba",
+      "region": "MB",
+      "coverage": "Brandon",
+      "category": "visual-arts",
+      "url": "https://agsm.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "iCalendar link"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-28",
+        "title": "Gala of Gifts",
+        "venue": "Art Gallery of Southwestern Manitoba",
+        "url": "https://agsm.ca/series/gala-of-gifts-2026/"
+      }
+    },
+    {
+      "id": "toronto-recreation",
+      "publisher": "City of Toronto Registered Programs and Drop-In Courses",
+      "region": "ON",
+      "coverage": "Toronto",
+      "category": "recreation",
+      "url": "https://open.toronto.ca/dataset/registered-programs-and-drop-in-courses-offering/",
+      "ingest": {
+        "adapter": "toronto-ckan-recreation",
+        "access": "open-data",
+        "endpoints": [
+          "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=registered-programs-and-drop-in-courses-offering",
+          "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/package_show?id=parks-and-recreation-facilities"
+        ],
+        "conditions": "Attribute the City under the Open Government Licence – Toronto."
+      },
+      "venueResolution": "Join schedule Location ID to the facility GeoJSON LOCATIONID. Use the actual session's first/last date and start/end time.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Leisure Swim",
+        "venue": "Scadding Court Community Centre",
+        "url": "https://www.toronto.ca/explore-enjoy/parks-recreation/places-spaces/parks-and-recreation-facilities/location/?id=1098"
+      }
+    },
+    {
+      "id": "toronto-library",
+      "publisher": "Toronto Public Library",
+      "region": "ON",
+      "coverage": "Toronto",
+      "category": "library",
+      "url": "https://tpl.ca/programs-and-classes/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-10",
+        "title": "Toronto Book Awards Prize Ceremony",
+        "venue": "Toronto Reference Library",
+        "url": "https://tpl.ca/programs-and-classes/featured/toronto-book-awards/"
+      }
+    },
+    {
+      "id": "nac",
+      "publisher": "National Arts Centre",
+      "region": "ON",
+      "coverage": "Ottawa",
+      "category": "performance",
+      "url": "https://nac-cna.ca/en/calendar/list",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Roch Voisine: The Lightfoot Sessions",
+        "venue": "Southam Hall",
+        "url": "https://nac-cna.ca/fr/event/notes/41214"
+      }
+    },
+    {
+      "id": "ottawa-library",
+      "publisher": "Ottawa Public Library",
+      "region": "ON",
+      "coverage": "Ottawa",
+      "category": "library",
+      "url": "https://booking.biblioottawalibrary.ca/program",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "iCalendar link"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Café for Adults",
+        "venue": "Greenboro branch",
+        "url": "https://booking.biblioottawalibrary.ca/program"
+      }
+    },
+    {
+      "id": "museum-of-nature",
+      "publisher": "Canadian Museum of Nature",
+      "region": "ON",
+      "coverage": "Ottawa",
+      "category": "museum",
+      "url": "https://nature.ca/en/visit-us/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "note": "For exhibits, show the applicable visit dates and venue hours. Treat a run's closing date separately from showtimes."
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-05-15",
+        "endsOn": "2027-01-10",
+        "title": "Wild Colour",
+        "venue": "Canadian Museum of Nature",
+        "url": "https://nature.ca/en/visit-us/whats-on/"
+      }
+    },
+    {
+      "id": "art-gallery-hamilton",
+      "publisher": "Art Gallery of Hamilton",
+      "region": "ON",
+      "coverage": "Hamilton",
+      "category": "visual-arts",
+      "url": "https://www.artgalleryofhamilton.com/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Art + Wellness: Dream Tea Workshop",
+        "venue": "Art Gallery of Hamilton",
+        "url": "https://www.artgalleryofhamilton.com/program/art-wellness-dream-tea-workshop/"
+      }
+    },
+    {
+      "id": "hamilton-civic-museums",
+      "publisher": "Hamilton Civic Museums",
+      "region": "ON",
+      "coverage": "Hamilton",
+      "category": "museum",
+      "url": "https://hamiltoncivicmuseums.ca/museum-events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "Wellness at Whitehern: A Historic Mental Health Tour",
+        "venue": "Whitehern Historic House and Garden",
+        "url": "https://hamiltoncivicmuseums.ca/museum-events/"
+      }
+    },
+    {
+      "id": "waterloo-library",
+      "publisher": "Waterloo Public Library",
+      "region": "ON",
+      "coverage": "Waterloo",
+      "category": "library",
+      "url": "https://www.waterloopubliclibrary.org/events/month",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Family Storytime",
+        "url": "https://www.waterloopubliclibrary.org/event/family-storytime-11827"
+      }
+    },
+    {
+      "id": "themuseum",
+      "publisher": "THEMUSEUM",
+      "region": "ON",
+      "coverage": "Kitchener",
+      "category": "museum",
+      "url": "https://themuseum.ca/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "The da Vinci Dialogues featuring Chris Nighman",
+        "venue": "THEMUSEUM",
+        "url": "https://themuseum.ca/events/the-da-vinci-dialogues-featuring-chris-nighman/"
+      }
+    },
+    {
+      "id": "guelph-museums",
+      "publisher": "Guelph Museums",
+      "region": "ON",
+      "coverage": "Guelph",
+      "category": "museum",
+      "url": "https://guelphmuseums.ca/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Mary’s Wedding by Stephen Massicotte",
+        "venue": "Civic Museum",
+        "url": "https://guelphmuseums.ca/events/"
+      }
+    },
+    {
+      "id": "museum-london",
+      "publisher": "Museum London",
+      "region": "ON",
+      "coverage": "London",
+      "category": "museum",
+      "url": "https://museumlondon.ca/exhibitions/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-10-31",
+        "endsOn": "2027-04-04",
+        "title": "Nico Williams: Bingo",
+        "venue": "Museum London",
+        "url": "https://museumlondon.ca/exhibitions/"
+      }
+    },
+    {
+      "id": "art-windsor-essex",
+      "publisher": "Art Windsor-Essex",
+      "region": "ON",
+      "coverage": "Windsor",
+      "category": "visual-arts",
+      "url": "https://artwindsoressex.ca/event_type/event/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "First Saturday Guided Tour",
+        "venue": "Art Windsor-Essex",
+        "url": "https://artwindsoressex.ca/events-workshops/first-saturday-guided-tour-10/"
+      }
+    },
+    {
+      "id": "sudbury-library",
+      "publisher": "Greater Sudbury Public Library",
+      "region": "ON",
+      "coverage": "Greater Sudbury",
+      "category": "library",
+      "url": "https://www.sudburylibraries.ca/events-calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Reading Buddies with United for Literacy",
+        "url": "https://www.sudburylibraries.ca/events-calendar/reading-buddies-with-united-for-literacy?id=1794520800-231619"
+      }
+    },
+    {
+      "id": "visit-thunder-bay",
+      "publisher": "Tourism Thunder Bay",
+      "region": "ON",
+      "coverage": "Thunder Bay area",
+      "category": "tourism",
+      "url": "https://www.visitthunderbay.com/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-08-12",
+        "endsOn": "2027-03-21",
+        "title": "Out of Place: The Strange Plants of Lake Superior’s North Shore",
+        "venue": "Thunder Bay Museum",
+        "url": "https://www.visitthunderbay.com/events/"
+      }
+    },
+    {
+      "id": "kingston-grand",
+      "publisher": "Kingston Grand Theatre",
+      "region": "ON",
+      "coverage": "Kingston",
+      "category": "performance",
+      "url": "https://www.kingstongrand.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-10",
+        "title": "Hyprov featuring Colin Mochrie and Asad Mecci",
+        "venue": "Rosen Auditorium",
+        "url": "https://www.kingstongrand.ca/events/hyprov-featuring-colin-mochrie-and-asad-mecci"
+      }
+    },
+    {
+      "id": "place-des-arts",
+      "publisher": "Place des Arts",
+      "region": "QC",
+      "coverage": "Montréal",
+      "category": "performance",
+      "url": "https://www.placedesarts.com/programmation",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-04",
+        "endsOn": "2026-11-15",
+        "title": "Entre chiens et louves",
+        "venue": "Place des Arts",
+        "url": "https://www.placedesarts.com/programmation"
+      }
+    },
+    {
+      "id": "phi",
+      "publisher": "PHI",
+      "region": "QC",
+      "coverage": "Montréal",
+      "category": "visual-arts",
+      "url": "https://phi.ca/programmation/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-10-29",
+        "endsOn": "2027-03-14",
+        "title": "Stephanie Comilang: HYMNES",
+        "venue": "PHI",
+        "url": "https://phi.ca/fr/evenements/stephanie-comilang-hymnes/"
+      }
+    },
+    {
+      "id": "montreal-fine-arts",
+      "publisher": "Musée des beaux-arts de Montréal",
+      "region": "QC",
+      "coverage": "Montréal",
+      "category": "visual-arts",
+      "url": "https://www.mbam.qc.ca/fr/expositions/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-19",
+        "endsOn": "2027-04-04",
+        "title": "Anne Kahane: Structures",
+        "venue": "Musée des beaux-arts de Montréal",
+        "url": "https://www.mbam.qc.ca/fr/expositions/"
+      }
+    },
+    {
+      "id": "grand-theatre-quebec",
+      "publisher": "Grand Théâtre de Québec",
+      "region": "QC",
+      "coverage": "Québec City",
+      "category": "performance",
+      "url": "https://grandtheatre.qc.ca/programmation/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "Croissants-Musique",
+        "venue": "Grand Théâtre de Québec",
+        "url": "https://grandtheatre.qc.ca/programmation/"
+      }
+    },
+    {
+      "id": "palais-montcalm",
+      "publisher": "Palais Montcalm",
+      "region": "QC",
+      "coverage": "Québec City",
+      "category": "music",
+      "url": "https://www.palaismontcalm.ca/concert-spectacle-quebec/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-13",
+        "title": "Harry Manx",
+        "venue": "Palais Montcalm",
+        "url": "https://www.palaismontcalm.ca/2026/10/les-couleurs-de-lautomne-au-palais-montcalm/"
+      }
+    },
+    {
+      "id": "bibliotheque-quebec",
+      "publisher": "Bibliothèque de Québec",
+      "region": "QC",
+      "coverage": "Québec City",
+      "category": "library",
+      "url": "https://www.bibliothequedequebec.qc.ca/Activites",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Samedi de jouer",
+        "venue": "Bibliothèque Collège-des-Jésuites",
+        "url": "https://bibliothequedequebec.qc.ca/activites/158/samedi-de-jouer/20430"
+      }
+    },
+    {
+      "id": "musee-civilisation",
+      "publisher": "Musée de la civilisation",
+      "region": "QC",
+      "coverage": "Québec City",
+      "category": "museum",
+      "url": "https://mcq.org/decouvrir/activites/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "Au plaisir",
+        "venue": "Musée de la civilisation",
+        "url": "https://mcq.org/decouvrir/activites/"
+      }
+    },
+    {
+      "id": "le-diamant",
+      "publisher": "Le Diamant",
+      "region": "QC",
+      "coverage": "Québec City",
+      "category": "performance",
+      "url": "https://www.lediamant.ca/fr/calendrier/calendrier-complet",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-25",
+        "endsOn": "2026-12-05",
+        "title": "887 – Ex Machina / Robert Lepage",
+        "venue": "Le Diamant",
+        "url": "https://www.lediamant.ca/fr/programmation/887"
+      }
+    },
+    {
+      "id": "sporobole",
+      "publisher": "Sporobole",
+      "region": "QC",
+      "coverage": "Sherbrooke",
+      "category": "visual-arts",
+      "url": "https://sporobole.org/diffusion/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-10-02",
+        "endsOn": "2026-11-27",
+        "title": "Apis Mellifera Concerto",
+        "venue": "Sporobole",
+        "url": "https://sporobole.org/diffusion/amelie-laurence-fortin-automne-2026/"
+      }
+    },
+    {
+      "id": "sherbrooke-centro",
+      "publisher": "SDC du centre-ville de Sherbrooke",
+      "region": "QC",
+      "coverage": "Sherbrooke",
+      "category": "community",
+      "url": "https://sherbrookecentro.ca/quoi-faire/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "iCalendar link"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-09-18",
+        "endsOn": "2027-01-10",
+        "title": "Religieuses, enseignantes et… scientifiques!",
+        "venue": "Musée de la nature et des sciences de Sherbrooke",
+        "url": "https://sherbrookecentro.ca/quoi-faire/"
+      }
+    },
+    {
+      "id": "centre-culturel-udes",
+      "publisher": "Centre culturel de l’Université de Sherbrooke",
+      "region": "QC",
+      "coverage": "Sherbrooke",
+      "category": "performance",
+      "url": "https://www.centrecultureludes.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Les Planètes de Holst: Un voyage cosmique immersif",
+        "venue": "Salle Maurice-O’Bready",
+        "url": "https://www.centrecultureludes.ca/"
+      }
+    },
+    {
+      "id": "culture-3r",
+      "publisher": "Culture Trois-Rivières",
+      "region": "QC",
+      "coverage": "Trois-Rivières",
+      "category": "performance",
+      "url": "https://www.culture3r.com/programmation/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Colombie, tout en couleur",
+        "url": "https://www.culture3r.com/programmations/projections/"
+      }
+    },
+    {
+      "id": "salle-odyssee",
+      "publisher": "Salle Odyssée",
+      "region": "QC",
+      "coverage": "Gatineau",
+      "category": "performance",
+      "url": "https://www.maisondelaculture.ca/Salle-Odyssee/spectacles/tous-les-spectacles/index.html",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Orchestre symphonique de Gatineau",
+        "venue": "Salle Odyssée",
+        "url": "https://www.maisondelaculture.ca/Salle-Odyssee/spectacles/tous-les-spectacles/index.html"
+      }
+    },
+    {
+      "id": "theatre-de-la-ville",
+      "publisher": "Théâtre de la Ville",
+      "region": "QC",
+      "coverage": "Longueuil",
+      "category": "performance",
+      "url": "https://www.theatredelaville.qc.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "note": "The publisher uses multiple performance rooms. Resolve the room or venue on each listing."
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Renée Robitaille performance",
+        "venue": "Théâtre de la Ville",
+        "url": "https://www.theatredelaville.qc.ca/"
+      }
+    },
+    {
+      "id": "musee-pop",
+      "publisher": "Musée POP",
+      "region": "QC",
+      "coverage": "Trois-Rivières",
+      "category": "museum",
+      "url": "https://museepop.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Capturez la magie de Noël – séance photo",
+        "venue": "Musée POP",
+        "url": "https://museepop.ca/"
+      }
+    },
+    {
+      "id": "moncton-city",
+      "publisher": "City of Moncton Events",
+      "region": "NB",
+      "coverage": "Moncton",
+      "category": "civic",
+      "url": "https://www.moncton.ca/en/things-do/events/calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "endsOn": "2026-11-07",
+        "title": "World Wine & Food Expo",
+        "venue": "Moncton Coliseum",
+        "url": "https://www.moncton.ca/en/things-do/events/calendar/world-wine-food-expo"
+      }
+    },
+    {
+      "id": "capitol-moncton",
+      "publisher": "Capitol Theatre",
+      "region": "NB",
+      "coverage": "Moncton",
+      "category": "performance",
+      "url": "https://capitol.nb.ca/en/tickets-events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "FrancoFête en Acadie – Vitrines du soir no 3",
+        "venue": "Capitol Theatre",
+        "url": "https://capitol.nb.ca/en/tickets-events"
+      }
+    },
+    {
+      "id": "beaverbrook",
+      "publisher": "Beaverbrook Art Gallery",
+      "region": "NB",
+      "coverage": "Fredericton",
+      "category": "visual-arts",
+      "url": "https://beaverbrookartgallery.org/programs-and-events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-09-01",
+        "endsOn": "2026-12-31",
+        "title": "Beaverbrook Highlights Drop-in Tours",
+        "venue": "Beaverbrook Art Gallery",
+        "url": "https://beaverbrookartgallery.org/programs-and-events/"
+      }
+    },
+    {
+      "id": "imperial-saint-john",
+      "publisher": "Imperial Theatre",
+      "region": "NB",
+      "coverage": "Saint John",
+      "category": "performance",
+      "url": "https://imperialtheatre.ca/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Hells Bells",
+        "venue": "Imperial Theatre",
+        "url": "https://imperialtheatre.ca/whats-on/"
+      }
+    },
+    {
+      "id": "centre-arts-dieppe",
+      "publisher": "Centre des arts et de la culture de Dieppe",
+      "region": "NB",
+      "coverage": "Dieppe",
+      "category": "performance",
+      "url": "https://centredesartsdieppe.ca/fr/programmation?start=0",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-08-12",
+        "endsOn": "2026-11-24",
+        "title": "Marking the Surface",
+        "venue": "Centre des arts et de la culture de Dieppe",
+        "url": "https://centredesartsdieppe.ca/fr/programmation?start=0"
+      }
+    },
+    {
+      "id": "arts-edmundston",
+      "publisher": "Centre des arts d’Edmundston",
+      "region": "NB",
+      "coverage": "Edmundston",
+      "category": "performance",
+      "url": "https://artsedmundston.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Jay Scøtt",
+        "venue": "Centre des arts d’Edmundston",
+        "url": "https://artsedmundston.ca/"
+      }
+    },
+    {
+      "id": "halifax-library",
+      "publisher": "Halifax Public Libraries",
+      "region": "NS",
+      "coverage": "Halifax Regional Municipality",
+      "category": "library",
+      "url": "https://halifax.bibliocommons.com/v2/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "BiblioCommons"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Family Drop-in",
+        "url": "https://halifax.bibliocommons.com/v2/events/6a8364523f18f80030bbc212",
+        "venue": "Alderney Gate Public Library"
+      }
+    },
+    {
+      "id": "neptune-theatre",
+      "publisher": "Neptune Theatre",
+      "region": "NS",
+      "coverage": "Halifax",
+      "category": "performance",
+      "url": "https://www.neptunetheatre.com/box-office",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-24",
+        "endsOn": "2026-12-27",
+        "title": "Dickens’ A Christmas Carol",
+        "venue": "Neptune Theatre",
+        "url": "https://www.neptunetheatre.com/box-office/dickens-a-christmas-carol"
+      }
+    },
+    {
+      "id": "alderney-landing",
+      "publisher": "Alderney Landing",
+      "region": "NS",
+      "coverage": "Dartmouth",
+      "category": "community",
+      "url": "https://www.alderneylanding.com/event-type/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-15",
+        "title": "Sunday Artisan Market",
+        "venue": "Alderney Landing",
+        "url": "https://www.alderneylanding.com/event-type/market/"
+      }
+    },
+    {
+      "id": "cape-breton-craft",
+      "publisher": "Cape Breton Centre for Craft & Design",
+      "region": "NS",
+      "coverage": "Sydney and Cape Breton",
+      "category": "workshops",
+      "url": "https://capebretoncraft.com/learn/workshops/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Create your own sweater",
+        "venue": "Cape Breton Centre for Craft and Design",
+        "url": "https://capebretoncraft.com/learn/workshops/"
+      }
+    },
+    {
+      "id": "acadia-cinema",
+      "publisher": "Acadia Cinema Cooperative",
+      "region": "NS",
+      "coverage": "Wolfville",
+      "category": "film",
+      "url": "https://www.alwhittletheatre.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Graham Howes & Friends: The Music of Tom Waits",
+        "venue": "Al Whittle Theatre",
+        "url": "https://www.alwhittletheatre.ca/events"
+      }
+    },
+    {
+      "id": "tourism-pei",
+      "publisher": "Tourism PEI",
+      "region": "PE",
+      "coverage": "Prince Edward Island",
+      "category": "tourism",
+      "url": "https://www.tourismpei.com/what-to-do/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "endsOn": "2026-11-08",
+        "title": "Westisle Christmas Market",
+        "venue": "Westisle Composite High School",
+        "url": "https://www.tourismpei.com/what-to-do/events/westisle-christmas-market"
+      }
+    },
+    {
+      "id": "confederation-centre",
+      "publisher": "Confederation Centre of the Arts",
+      "region": "PE",
+      "coverage": "Charlottetown",
+      "category": "performance",
+      "url": "https://confederationcentre.com/whats-on/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-18",
+        "title": "PEI Arts Awards Ceremony",
+        "venue": "The Mack",
+        "url": "https://confederationcentre.com/event/pei-arts-awards/"
+      }
+    },
+    {
+      "id": "harbourfront-theatre",
+      "publisher": "Harbourfront Theatre",
+      "region": "PE",
+      "coverage": "Summerside",
+      "category": "performance",
+      "url": "https://harbourfronttheatre.com/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-08",
+        "title": "PEI Legion Choir: True North",
+        "venue": "Harbourfront Theatre",
+        "url": "https://harbourfronttheatre.com/shows/pei-legion-choir/"
+      }
+    },
+    {
+      "id": "pei-library",
+      "publisher": "PEI Public Library Service",
+      "region": "PE",
+      "coverage": "Prince Edward Island",
+      "category": "library",
+      "url": "https://peilibrary.libcal.com/calendars",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "LibCal"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Kids Crafternoon",
+        "venue": "Summerside Rotary Library",
+        "url": "https://peilibrary.libcal.com/event/3952035"
+      }
+    },
+    {
+      "id": "the-rooms",
+      "publisher": "The Rooms",
+      "region": "NL",
+      "coverage": "St. John’s",
+      "category": "museum",
+      "url": "https://therooms.ca/event-calendar",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "iCalendar link"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Woven Heritage: Preserving Weaving in Newfoundland and Labrador",
+        "venue": "The Rooms Theatre",
+        "url": "https://therooms.ca/event-calendar?date=2026-11"
+      }
+    },
+    {
+      "id": "lspu-hall",
+      "publisher": "Resource Centre for the Arts at LSPU Hall",
+      "region": "NL",
+      "coverage": "St. John’s",
+      "category": "performance",
+      "url": "https://lspuhall.ca/hall/current-upcoming/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-03",
+        "endsOn": "2026-11-07",
+        "title": "St. John’s Short Play Festival – Group A",
+        "venue": "LSPU Hall",
+        "url": "https://lspuhall.ca/hall/current-upcoming/"
+      }
+    },
+    {
+      "id": "st-johns-farmers-market",
+      "publisher": "St. John’s Farmers’ Market",
+      "region": "NL",
+      "coverage": "St. John’s",
+      "category": "market",
+      "url": "https://sjfm.ca/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Saturday farmers’ market",
+        "venue": "St. John’s Farmers’ Market",
+        "url": "https://sjfm.ca/"
+      }
+    },
+    {
+      "id": "nlpl",
+      "publisher": "Newfoundland and Labrador Public Libraries",
+      "region": "NL",
+      "coverage": "Newfoundland and Labrador",
+      "category": "library",
+      "url": "https://nlpl.ca/events/list/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the branch or offsite venue named on the occurrence.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-20",
+        "title": "Men’s Book Club",
+        "venue": "Happy Valley-Goose Bay Public Library",
+        "url": "https://nlpl.ca/events/category/book-clubs-writers-groups/list/"
+      }
+    },
+    {
+      "id": "nl-arts-culture-centres",
+      "publisher": "Arts and Culture Centres",
+      "region": "NL",
+      "coverage": "Multiple Newfoundland and Labrador communities",
+      "category": "performance",
+      "url": "https://artsandculturecentre.com/Online/default.asp",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-13",
+        "title": "Out of the Ashes",
+        "venue": "Corner Brook Arts and Culture Centre",
+        "url": "https://artsandculturecentre.com/cornerbrook/online/"
+      }
+    },
+    {
+      "id": "afy",
+      "publisher": "Association franco-yukonnaise",
+      "region": "YT",
+      "coverage": "Whitehorse and Yukon communities",
+      "category": "community",
+      "url": "https://afy.ca/a-venir",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Coup de cœur francophone",
+        "venue": "Old Fire Hall",
+        "url": "https://www.afy.ca/evenement/concert-ccf"
+      }
+    },
+    {
+      "id": "yukon-film-society",
+      "publisher": "Yukon Film Society",
+      "region": "YT",
+      "coverage": "Whitehorse",
+      "category": "film",
+      "url": "https://yukonfilmsociety.com/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Yukon 48 Filmmaking Challenge screening",
+        "venue": "Yukon Theatre",
+        "url": "https://yukonfilmsociety.com/schedule/yukon-48-filmmaking-challenge-2026"
+      }
+    },
+    {
+      "id": "kiac",
+      "publisher": "Klondike Institute of Art & Culture",
+      "region": "YT",
+      "coverage": "Dawson City",
+      "category": "visual-arts",
+      "url": "https://kiac.ca/calendar-of-events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-07",
+        "title": "Coffee House & Open Mic Night",
+        "venue": "Klondike Institute of Art & Culture",
+        "url": "https://kiac.ca/fr/calendar-of-events/coffee-house-open-mic-night-4/"
+      }
+    },
+    {
+      "id": "nacc",
+      "publisher": "Northern Arts and Cultural Centre",
+      "region": "NT",
+      "coverage": "Yellowknife and touring communities",
+      "category": "performance",
+      "url": "https://www.naccnt.ca/events/list/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Event JSON-LD",
+          "iCalendar link",
+          "The Events Calendar markup"
+        ]
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "title": "Sechile Sedare Album Launch",
+        "venue": "Northern Arts and Cultural Centre",
+        "url": "https://www.naccnt.ca/events/list/"
+      }
+    },
+    {
+      "id": "yellowknife-city",
+      "publisher": "City of Yellowknife Events",
+      "region": "NT",
+      "coverage": "Yellowknife",
+      "category": "civic",
+      "url": "https://www.yellowknife.ca/events",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page"
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-12",
+        "title": "Thursday Stories & Stations",
+        "venue": "Yellowknife Public Library",
+        "url": "https://www.yellowknife.ca/events/thursday-stories-stations-0-5-years"
+      }
+    },
+    {
+      "id": "visit-inuvik",
+      "publisher": "Inuvik Visitor Guide",
+      "region": "NT",
+      "coverage": "Inuvik",
+      "category": "tourism",
+      "url": "https://visitinuvik.ca/events/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "Embedded dated event JSON"
+        ],
+        "note": "The calendar embeds named venues and dated events. Keep public activities such as the Arctic Market; a holiday with only a country-wide location is not an event near a pin."
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-14",
+        "title": "Arctic Market",
+        "venue": "Midnight Sun Complex",
+        "url": "https://visitinuvik.ca/events/arctic-market-4/"
+      }
+    },
+    {
+      "id": "ampere-iqaluit",
+      "publisher": "Ampere Iqaluit Makerspace",
+      "region": "NU",
+      "coverage": "Iqaluit",
+      "category": "workshops",
+      "url": "https://www.eventbrite.ca/o/pinnguaq-association-28538072865",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "organizer-approval",
+        "formatHints": [
+          "Eventbrite organizer page"
+        ],
+        "note": "This is the organizer's public ticketing calendar. For automated import, use an organizer-authorized export or integration. Filter listings to the Iqaluit makerspace before checking the venue radius."
+      },
+      "venueResolution": "Resolve the named venue or meeting point from the listing and its source.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-06",
+        "endsOn": "2026-11-27",
+        "title": "Kid’s Game Club, Friday series",
+        "venue": "Pinnguaq Iqaluit Makerspace",
+        "url": "https://www.eventbrite.ca/e/kids-game-club-fridays-november-6-27-2026-tickets-2004012491308"
+      }
+    },
+    {
+      "id": "ilitaqsiniq",
+      "publisher": "Ilitaqsiniq Nunavut Literacy Council",
+      "region": "NU",
+      "coverage": "Nunavut communities",
+      "category": "workshops",
+      "url": "https://ilitaqsiniq.ca/events/list/",
+      "ingest": {
+        "adapter": "publisher-calendar",
+        "access": "public-page",
+        "formatHints": [
+          "The Events Calendar markup",
+          "Event JSON-LD"
+        ],
+        "note": "Some program records identify only the community, including this example. Obtain the actual program site and occurrence times before publishing those records."
+      },
+      "venueResolution": "Confirm the actual program site and session dates with the publisher when the listing gives a town or program range.",
+      "verification": {
+        "kind": "dated-listing",
+        "startsOn": "2026-11-16",
+        "endsOn": "2027-01-22",
+        "title": "Taloyoak Miqqut",
+        "venue": "Taloyoak (program site to confirm)",
+        "url": "https://ilitaqsiniq.ca/event/taloyoak-miqqut/"
+      }
+    }
+  ]
+}

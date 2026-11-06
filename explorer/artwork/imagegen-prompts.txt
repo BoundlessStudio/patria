@@ -1,0 +1,65 @@
+Mode: Default built-in image_gen tool mode
+Intent: generate
+Execution: one parallel batch, one built-in call per asset
+transparent_background: false for both assets
+
+HERO PROMPT
+Use case: illustration-story
+Asset type: wide 16:9 homepage hero illustration
+Primary request: Create an original panoramic painted neighborhood scene for a welcoming community website, with a generous pale-blue cloudy sky in the upper left and upper center that can support a dark webpage heading overlay.
+Scene/backdrop: A fictional walkable mixed-use urban neighborhood in early autumn. A leafy park fills the lower foreground. Old brick low-rise homes and small cafe and bookshop facades frame the left and right edges. A gentle pedestrian path leads through the park toward the neighborhood.
+Subject: Friendly pedestrians of different ages enjoying everyday neighborhood life, including one person cycling. Keep the people naturally scaled within the landscape and avoid crowding.
+Style/medium: Storybook watercolor and gouache illustration, delicate hand-painted texture, nuanced foliage, softly articulated brick and architectural details, inviting realistic perspective.
+Composition/framing: Wide landscape panorama, approximately 16:9. Keep the central upper half open, luminous, and visually calm. Buildings and trees form an airy frame around the sides; park greenery anchors the bottom. Compose a complete image that also works when the website crops a little from the top and bottom.
+Lighting/mood: Warm buttery sunlight, fresh and inviting, quietly lively early autumn day.
+Color palette: Luminous pale blue sky, leafy green, dark evergreen accents, terracotta brick, warm cream, soft golden yellow.
+Materials/textures: Watercolor paper grain, flowing watercolor washes with selective opaque gouache detail, textured leaves and sunlit stone paths.
+Constraints: Entirely original imagined place; illustrative scene, not a map or a claim about a real neighborhood. No text, no lettering, no readable or abstract sign text, no logos, no watermarks, no UI. Do not include a webpage, heading, border, or typography. Preserve clear sky space for copy that will be added separately.
+
+FOOTER PROMPT
+Use case: illustration-story
+Asset type: wide landscape footer call-to-action banner illustration
+Primary request: Create an original painted neighborhood park scene for the lower banner of a welcoming community website, with a mostly pale softly glowing sky in the upper center that can support a dark webpage call-to-action overlay.
+Scene/backdrop: A fictional walkable mixed-use urban neighborhood at quiet golden hour in early autumn. A park path curves gently from the lower foreground toward cozy cafe facades and old brick low-rise homes beyond. Leafy trees frame the outer edges.
+Subject: A few friendly people of different ages strolling through the park, naturally scaled within the landscape. Everyday calm community life.
+Style/medium: Storybook watercolor and gouache illustration, delicate hand-painted texture and nuanced foliage, softly articulated brick and architectural details, inviting realistic perspective. Use the visual family of a sunlit panoramic painted neighborhood hero: airy watercolor washes, paper texture, selective opaque gouache detail.
+Composition/framing: Wide landscape panorama, approximately 16:9, composed to work as a lower website banner. Keep the upper center pale, open, calm, and luminous for page copy. Park path and greenery occupy the lower third; homes and trees sit mainly along the side edges and lower horizon. Compose a complete image that still works when cropped into a wide horizontal banner.
+Lighting/mood: Soft golden-hour warmth, buttery sunlight through foliage, peaceful and welcoming.
+Color palette: Pale softly glowing cream-blue sky, leafy green, dark evergreen accents, terracotta brick, warm cream, golden yellow.
+Materials/textures: Watercolor paper grain, flowing washes, painted foliage, sunlit stone path, subtle gouache highlights.
+Constraints: Entirely original imagined place; illustrative scene, not a map or a claim about a real neighborhood. No text, no lettering, no readable or abstract sign text, no logos, no watermarks, no UI. Do not include a webpage, call-to-action, heading, border, or typography. Preserve clear sky space for copy that will be added separately.
+
+HERO V2 EDIT
+Mode: Default built-in image_gen tool mode
+Intent: edit
+Execution: exactly one targeted edit call, no variants
+Input: hero-illustration.png
+Output: hero-illustration-v2.png
+transparent_background: false
+
+Use case: precise-object-edit
+Asset type: wide 16:9 homepage hero illustration
+Input images: Image 1 is the edit target, the existing painted neighborhood hero.
+Primary request: Make a targeted repair to the street geometry so the central green park is visibly and plausibly bordered on BOTH its left and right sides by continuous narrow paved residential roads with distinct curbs.
+Street geometry: Preserve the central park and its pedestrian path, but insert a clear continuous gray paved road between the park and the left row of brick buildings, and another clear continuous gray paved road between the park and the right row of brick buildings. Each road must recede coherently toward the neighborhood horizon in realistic perspective and have readable curb edges, a believable paved width, and uninterrupted connections. Immediately in front of each row of buildings, provide a separate paved sidewalk. On both sides, make the spatial progression unmistakable: buildings face their sidewalk, then road, then curb, then green park. Keep pedestrians on sidewalks or park paths; place the cyclist on a road. A small tasteful crosswalk may connect a building-side sidewalk to the park. Buildings must be physically separated from the park rather than melting into grass or pedestrian paths.
+Style/medium: Preserve the luminous storybook watercolor and gouache painting, paper grain, softly articulated brick, delicate foliage, welcoming realistic perspective.
+Composition/framing: Keep the same wide panorama, overall central park and neighborhood composition, low-rise brick homes and cafes toward the side edges, distant vista, warm early-autumn palette. Preserve the generous uncluttered pale-blue and white cloudy sky across the upper center for dark webpage copy. Slightly reduce the busy foliage at the top corners so it frames the sky more lightly.
+Lighting/mood: Preserve buttery daylight, calm warmth, leafy greens, dark-evergreen details, terracotta brick, gold and cream.
+Constraints: Change only the street/sidewalk/curb geometry and the small reduction in upper foliage needed for this repair, adjusting local objects minimally so they sit plausibly in the corrected scene. Keep the original painted visual identity and sky negative space. Original fictional neighborhood, not a map or an actual-location claim. No text, no lettering, no signage text, no logos, no watermarks, no UI, no webpage headings, and no white gradient fades baked into the raster.
+
+FOOTER V2 EDIT
+Mode: Default built-in image_gen tool mode
+Intent: edit
+Execution: exactly one targeted edit call, no variants
+Input: footer-illustration.png
+Output: footer-illustration-v2.png
+transparent_background: false
+
+Use case: precise-object-edit
+Asset type: wide landscape footer call-to-action banner illustration
+Input images: Image 1 is the edit target, the existing golden-hour painted neighborhood park footer.
+Primary request: Remove ALL of the near and foreground houses along the LEFT edge of the image, which currently crowd directly against the park. Replace their entire footprint with plausible open park space: leafy trees, lawn, low shrubs, flowers, and natural park ground in coherent perspective.
+Localized edit: The close left-side row of brick buildings and their stoops, stairs, roofs, and walls must disappear completely. There must be no buildings directly abutting the left foreground park or left walking path. Continue an inviting open park environment through their former footprint, with airy natural spacing between trees and a clear lawn, retaining a sense of depth. Distant homes across the pond and near the far center horizon may remain.
+Preserve: Keep the left walking path and its strolling couple and dog; keep other park people, park benches and lamps, pond, ducks, bridge, the right-side and far-side buildings, original scene perspective, and wide panorama. Preserve the welcoming luminous watercolor and gouache style, watercolor paper grain, delicate foliage, golden-hour mood, early-autumn warm palette, and pale softly glowing top-center sky space for webpage copy.
+Composition/framing: Keep the overall image composition and unobstructed upper-center sky. Left foreground becomes park rather than architecture; preserve the existing pond and bridge as the middle-right focal area and the far/right neighborhood beyond.
+Constraints: Make only this targeted removal and natural park replacement, with minimal local adjustment needed for coherence. No text, lettering, signage text, logos, watermarks, UI, webpage headings, or baked-in white gradient fades. Preserve opacity and the existing full painted raster image.
