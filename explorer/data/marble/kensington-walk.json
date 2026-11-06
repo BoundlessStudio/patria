@@ -1,0 +1,26 @@
+{
+  "collection": "walks",
+  "target": "kensington",
+  "displayName": "Kensington Market to Bellevue Square",
+  "prompt": "Create a short, explorable scene inspired by Kensington Market in Toronto, from the market's low-rise commercial streets toward the edge of Bellevue Square Park. Keep a continuous walkable sidewalk with a clear turn and a greener open space at the end. Use narrow sidewalks, low brick shopfronts, simple bicycle rings, and modest curbside planting. Give the buildings solid muted clay, sand, and slate finishes with simple forms and soft directional shadows. Use the walking viewpoint of a person on the sidewalk. Represent the neighborhood as a stylized interpretation and leave out precise signage and invented landmarks.",
+  "sources": [
+    {
+      "use": "context",
+      "url": "https://www.openstreetmap.org/#map=18/43.6544/-79.4017",
+      "credit": "OpenStreetMap contributors",
+      "license": "ODbL 1.0"
+    },
+    {
+      "use": "context",
+      "url": "https://commons.wikimedia.org/wiki/File:Looking_south_down_Kensington_Avenue,_Toronto_2026.jpg",
+      "credit": "Chicken4War, Kensington Avenue photograph",
+      "license": "CC BY-SA 4.0"
+    },
+    {
+      "use": "context",
+      "url": "https://www.toronto.ca/explore-enjoy/parks-recreation/places-spaces/parks-and-recreation-facilities/location/?id=263&title=Bellevue-Square-Park",
+      "credit": "City of Toronto, Bellevue Square Park",
+      "license": "Public reference for park location and features"
+    }
+  ]
+}

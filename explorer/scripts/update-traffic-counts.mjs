@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 
-const assetDirectory = new URL('../public/assets/', import.meta.url);
+const assetDirectory = new URL('../data/traffic/', import.meta.url);
 const torontoTable = 'https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search';
 const calgaryTable = 'https://data.calgary.ca/resource/cauu-7hnw.geojson?$limit=5000';
 const quebecMap = 'https://ws.mapserver.transports.gouv.qc.ca/swtq?service=wfs&version=2.0.0&request=getfeature&typename=ms:circulation_routier&srsname=EPSG:4326&outputformat=geojson';

@@ -1,0 +1,58 @@
+.map-section .map-top { border-color: transparent; }
+
+.map-section .map-heading,
+.map-section .map-legend,
+.map-section .map-control,
+.map-section .map-tools button {
+  background: #22282ef0;
+  color: #f4efe3;
+  border-color: #555955;
+}
+
+.map-section .map-heading-icon { color: #ead5aa; background: #3a403d; }
+.map-section .map-eyebrow { color: #c3c9b7; }
+.map-section .map-north { color: #fff6e5; text-shadow: 0 1px 4px #1f2627; }
+.map-section .legend-pin { background: #8fb5a0; }
+.map-section .legend-center { background: #cb9f60; }
+
+.street-view-launch,
+.street-view-back,
+.traffic-status {
+  position: absolute;
+  left: 26px;
+  z-index: 440;
+}
+
+.street-view-launch { bottom: 76px; }
+.street-view-back { top: 24px; }
+.street-view-launch:disabled { display: none; }
+.traffic-status {
+  bottom: 129px;
+  border: 1px solid #69665b;
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: #22282ef5;
+  color: #fff0d7;
+  font-size: 11px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.traffic-status:hover { text-decoration: underline; }
+.detail-street-button { width: 100%; justify-content: center; }
+.marble-preview { margin: 14px 0 0; font-size: 13px; }
+.marble-preview > a { font-weight: 650; text-underline-offset: 3px; }
+.marble-preview small { display: block; margin-top: 5px; color: var(--muted); line-height: 1.45; }
+.marble-preview .icon { width: 14px; height: 14px; }
+
+.map-section[data-street-view] :is(.map-top, .map-legend, .map-tools, .map-north, .layer-control,
+    .street-view-launch, .traffic-status, .search-area, .detail-card, .tour-card) {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .street-view-launch, .street-view-back, .traffic-status { left: 17px; }
+  .map-section:has(.detail-card:not([hidden]), .tour-card:not([hidden])) :is(.street-view-launch, .traffic-status) {
+    display: none;
+  }
+}

@@ -3,6 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { handleApi, requireUserRoute } from './worker/api.mjs';
+try {
+  process.loadEnvFile(new URL('./.env', import.meta.url));
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
 const root = fileURLToPath(new URL('./public/', import.meta.url)).replace(/[\\/]$/, '');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.txt': 'text/plain', '.json': 'application/json' };
 http.createServer(async (req, res) => {

@@ -13,6 +13,19 @@ test('the public session is never cached',async()=>{
   assert.deepEqual(data,{user:null,hosted:false});
   assert.equal(response.headers.get('Cache-Control'),'no-store');
 });
+test('map config exposes only the browser key and vector map ID',async()=>{
+  const publicRequest = {user:false};
+  const {response,data} = await call('/api/map-config',publicRequest,{
+    GOOGLE_MAPS_BROWSER_KEY:'browser-example',
+    GOOGLE_MAPS_MAP_ID:'vector-map-id',
+    GOOGLE_MAPS_API_KEY:'server-example',
+    WLT_API_KEY:'marble-example',
+  });
+  assert.equal(response.status,200);
+  assert.equal(response.headers.get('Cache-Control'),'no-store');
+  assert.deepEqual(data,{browserKey:'browser-example',mapId:'vector-map-id'});
+  assert.equal((await call('/api/map-config',publicRequest)).response.status,503);
+});
 test('place endpoints require platform identity',async()=>{
   for(const path of ['/api/search?q=Toronto','/api/nearby?lat=43&lng=-79'])assert.equal((await call(path,{user:false})).response.status,401);
 });

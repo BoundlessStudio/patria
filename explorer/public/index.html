@@ -27,14 +27,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="home.css">
-  <link rel="stylesheet" href="walk-preview.css">
-  <script src="map-style.js" defer></script>
+  <link rel="stylesheet" href="map.css">
   <script src="app.js" defer></script>
-  <script src="walk-avatar.js" defer></script>
-  <script src="traffic-models.js" defer></script>
-  <script src="map-traffic.js" defer></script>
-  <script src="street-details.js" defer></script>
-  <script src="walk-preview.js" defer></script>
   <script src="pages.js" defer></script>
 </head>
 <body>
@@ -84,58 +78,19 @@
     <section class="map-section" aria-label="Neighborhood map">
       <div id="map" role="region" aria-label="Interactive map of neighborhood places"></div>
       <div class="map-top"><div class="map-heading"><span class="map-heading-icon" data-icon="compass"></span><div><span class="map-eyebrow">YOUR NEIGHBORHOOD, A LITTLE CLOSER</span><h2 id="map-title">Kensington Market</h2></div></div><button class="map-control" id="recenter-button" aria-label="Recenter map" title="Recenter map" disabled><span data-icon="locate"></span></button></div>
-      <div id="map-error" class="map-error" role="status" hidden></div>
-      <a id="traffic-status" class="traffic-status" href="/setup#traffic" target="_blank" rel="noopener noreferrer" hidden></a>
+      <div id="map-error" class="map-error" role="status" hidden><span></span> <a href="/setup">Map setup</a></div>
+      <a id="traffic-status" class="traffic-status" href="/setup#traffic" target="_blank" rel="noopener noreferrer" hidden>Live traffic · Google Maps</a>
       <div class="map-legend"><span class="legend-pin"></span>Places to discover<span class="legend-center"></span>Your starting point</div>
       <div class="map-tools"><button id="zoom-in" aria-label="Zoom in" disabled>+</button><button id="zoom-out" aria-label="Zoom out" disabled>−</button></div>
       <div class="map-north" aria-hidden="true">N<span>↑</span></div>
       <div class="detail-card" id="detail-card" hidden></div>
       <div class="tour-card" id="tour-card" hidden></div>
-      <button id="walk-preview-launch" class="dark-button walk-preview-launch" type="button" disabled><span data-icon="walk"></span>Preview a walk</button>
-      <form id="walk-preview-form" class="walk-planner" aria-labelledby="walk-planner-title" hidden>
-        <span class="eyebrow">STREET-LEVEL WALK</span>
-        <h2 id="walk-planner-title">Choose your route</h2>
-        <button id="walk-cancel" class="card-close" type="button" aria-label="Close walk planner"><span data-icon="close"></span></button>
-        <fieldset id="walk-preview-fields">
-          <div class="walk-point">
-            <span class="walk-letter" aria-hidden="true">A</span>
-            <label for="walk-from">Start<select id="walk-from" required></select></label>
-            <button type="button" data-pick-walk-point="from" aria-label="Pick starting point on map">Pick on map</button>
-          </div>
-          <div class="walk-point">
-            <span class="walk-letter" aria-hidden="true">B</span>
-            <label for="walk-to">Destination<select id="walk-to" required></select></label>
-            <button type="button" data-pick-walk-point="to" aria-label="Pick destination on map">Pick on map</button>
-          </div>
-          <button class="dark-button walk-start" type="submit"><span data-icon="walk"></span>Start walk</button>
-        </fieldset>
-        <p id="walk-preview-status" class="walk-status" role="status"></p>
-      </form>
-      <div id="walk-pick-hint" class="walk-pick-hint" hidden>
-        <span id="walk-pick-instruction" role="status"></span><button id="walk-pick-cancel" type="button">Cancel</button>
-      </div>
-      <div id="walk-look" class="walk-look" role="group" aria-label="Look around the route. Use the left and right arrow keys to turn and the up and down arrow keys to step." tabindex="0" hidden></div>
-      <div id="walk-playback" hidden>
-        <div class="walk-playback-heading">
-          <button id="walk-exit" type="button">Back to map</button>
-          <div class="walk-route-heading"><h2 id="walk-route-title"></h2><p id="walk-route-summary"></p></div>
-          <button id="walk-view" type="button">Route overview</button>
-        </div>
-        <div class="walk-transport" aria-label="Walk playback">
-          <div class="walk-transport-caption"><span class="walk-look-help">Drag to look around</span><span id="walk-distance-progress"></span></div>
-          <input id="walk-progress" type="range" min="0" max="1000" step="1" value="0" aria-label="Progress along walking route">
-          <div class="walk-transport-buttons">
-            <button id="walk-backward" type="button" aria-label="Step back 10 metres">−10 m</button>
-            <button id="walk-play" class="dark-button" type="button">Play</button>
-            <button id="walk-forward" type="button" aria-label="Step forward 10 metres">+10 m</button>
-          </div>
-          <div class="walk-credits"><a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noopener noreferrer">Routing by FOSSGIS</a><a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Improve this map</a></div>
-        </div>
-      </div>
+      <button id="street-view-button" class="dark-button street-view-launch" type="button" disabled><span data-icon="street"></span>Street View</button>
+      <button id="street-view-back" class="dark-button street-view-back" type="button" hidden>Back to map</button>
     </section>
   </main>
   <dialog id="neighborhood-dialog" class="dialog"><button class="dialog-close" data-close aria-label="Close neighborhood selection"><span data-icon="close"></span></button><span class="eyebrow">A DIFFERENT POINT OF VIEW</span><h2>Where to next?</h2><p>Try one of these Toronto neighborhoods, or search any location.</p><div id="neighborhood-options"></div><button class="text-button" id="search-instead">Search somewhere else</button></dialog>
-  <dialog id="about-dialog" class="dialog about-dialog"><button class="dialog-close" data-close aria-label="Close about Patria"><span data-icon="close"></span></button><span class="eyebrow">FOR LOCALS. FOR VISITORS. FOR YOU.</span><h2>Curiosity belongs<br>to everyone.</h2><p>Patria helps you explore the life around a place, whether you’ve lived there for years or just arrived.</p><div class="about-block"><h3>Real places, with a little context.</h3><p>Toronto collections use tourism, city, and business sources. The map, worldwide search, and nearby discovery use OpenStreetMap. Check a venue’s details before visiting.</p><p>Distances are straight-line estimates. Walks show a suggested stop sequence. Google Maps supplies walking directions. Saved places and your exploration preferences stay on this device.</p></div><div class="about-links"><a href="https://www.destinationtoronto.com/neighbourhoods/westside/kensington-market/" target="_blank" rel="noopener noreferrer">Destination Toronto</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a><a href="https://maps.google.com/" target="_blank" rel="noopener noreferrer">Google Maps</a><a href="https://heymirai.ai/" target="_blank" rel="noopener noreferrer">Experience inspiration: Mirai</a></div><div id="photo-credits" class="photo-credits"></div></dialog>
+  <dialog id="about-dialog" class="dialog about-dialog"><button class="dialog-close" data-close aria-label="Close about Patria"><span data-icon="close"></span></button><span class="eyebrow">FOR LOCALS. FOR VISITORS. FOR YOU.</span><h2>Curiosity belongs<br>to everyone.</h2><p>Patria helps you explore the life around a place, whether you’ve lived there for years or just arrived.</p><div class="about-block"><h3>Real places, with a little context.</h3><p>Toronto collections use tourism, city, and business sources. Google Maps supplies the map, live traffic, and Street View. Location search and nearby discovery use OpenStreetMap data. Check a venue’s details before visiting.</p><p>Distances are straight-line estimates. Walks show a suggested stop sequence. Google Maps supplies walking directions. Saved places and your exploration preferences stay on this device.</p></div><div class="about-links"><a href="https://www.destinationtoronto.com/neighbourhoods/westside/kensington-market/" target="_blank" rel="noopener noreferrer">Destination Toronto</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a><a href="https://maps.google.com/" target="_blank" rel="noopener noreferrer">Google Maps</a><a href="https://heymirai.ai/" target="_blank" rel="noopener noreferrer">Experience inspiration: Mirai</a></div><div id="photo-credits" class="photo-credits"></div></dialog>
   <dialog id="signin-dialog" class="dialog"><button class="dialog-close" data-close aria-label="Close sign-in information"><span data-icon="close"></span></button><span class="eyebrow">A LITTLE MORE YOU</span><h2>Make yourself<br>at home.</h2><p>Sign in to choose a starting point and make your neighborhood experience your own.</p><a class="dark-button" id="platform-signin" href="/signin-with-chatgpt?return_to=%2Fonboarding" target="_top">Sign in with ChatGPT</a><p id="signin-info" class="wizard-footnote"></p></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>

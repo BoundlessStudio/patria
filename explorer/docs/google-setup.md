@@ -1,34 +1,41 @@
-# Patria maps and world models lab
+# Patria maps and Marble scenes
 
-Patria's explorer uses OpenStreetMap geometry, OpenFreeMap tiles, Photon place search, and FOSSGIS walking routes. Its third-person walk renders solid muted buildings. OpenStreetMap features place the bicycle racks, bins, and transit stop poles. The [map sources page](https://patria.rgbknights.com/setup) credits the street photo used for sidewalk and curb reference.
+## Google Maps
 
-## Google Maps comparison
+The explorer loads the Google Maps JavaScript vector map with the Patria Lab Muted cloud style. Use the layer menu for the tilted 3D roadmap, a flat view, satellite imagery, or live traffic. Street View opens Google's native panorama from the map center or a place card. Pegman shows imagery coverage and lets you choose a street. [Map building styles](https://developers.google.com/maps/documentation/javascript/cloud-customization/building-style) [Street View](https://developers.google.com/maps/documentation/javascript/streetview)
 
-Use the existing **patria** Google Cloud project. Evaluate Google services together in a separate Google map. Google's standard terms restrict deriving street geometry, object indexes, or training data from its imagery. [Google Maps Platform terms](https://cloud.google.com/maps-platform/terms)
+The Patria Browser key in `patria-510720` is limited to Maps JavaScript and Patria's two hosted origins and loopback development URLs. Sites supplies `GOOGLE_MAPS_BROWSER_KEY` at runtime. For local development, put it in `.env`. The style lives on the Patria Lab vector Map ID in `patria-513913`. Set `GOOGLE_MAPS_MAP_ID` to override that ID. The Worker returns only these public browser settings to the explorer.
 
-| Service | Lab use |
-| --- | --- |
-| Maps JavaScript API | Vector roadmap with a cloud style and Map ID, Satellite mode, and Street View panoramas in a Google map |
-| Places API (New) | Place lookup and nearby search with a minimal field mask |
-| Geocoding API | Address-to-coordinate and reverse address lookup |
-| Geolocation API | Approximate positioning from network data for clients without usable GPS |
-| Map Tiles API | Separate display experiments with satellite, Street View, and Photorealistic 3D tiles |
+Photon supplies independent location search and nearby places from OpenStreetMap. Suggested walks link to Google Maps for directions. Live traffic colors show current road conditions where Google has coverage. Historical traffic counts are available in `data/traffic/`. [Map sources](https://patria.rgbknights.com/setup) [Traffic layer](https://developers.google.com/maps/documentation/javascript/trafficlayer)
 
-Cloud styling controls colors and visibility for map features such as buildings, roads, parks, and water. Panorama photos retain their original appearance. Keep the browser key website-restricted to the lab origin and API-restricted to its client services. Use separately scoped server credentials for server-side requests. [Cloud map styling](https://developers.google.com/maps/documentation/javascript/cloud-customization) [Key restrictions](https://developers.google.com/maps/api-security-best-practices)
+## Create a Marble scene
 
-Street View Insights is a separate offering for statistical analysis of assets such as street signs and utility poles. Its access and use terms are distinct from the Maps JavaScript and Map Tiles APIs. [Street View Insights](https://developers.google.com/maps/documentation/street-view-insights/overview)
+Keep Google map tiles, Street View imagery, and Places content in the Google experience. Google Maps Platform terms restrict using them to build derivative scenes or as AI inputs. Build the scene brief from independent sources such as OpenStreetMap geometry, municipal open data, your own street photos, and openly licensed street or aerial imagery. Review each media licence against World Labs' input terms and keep its attribution with the scene. [Google Maps terms](https://cloud.google.com/maps-platform/terms) [World Labs terms](https://www.worldlabs.ai/terms-of-service)
 
-## Open imagery and live traffic
+Look for street coverage on KartaView and Mapillary. OpenAerialMap has openly licensed aerial imagery where coverage is available. [KartaView terms](https://kartaview.org/terms) [Mapillary imagery licence](https://help.mapillary.com/hc/en-us/articles/115001770409-CC-BY-SA-license-for-open-data) [OpenAerialMap licence](https://openaerialmap.org/about/)
 
-| Source | Where it fits |
-| --- | --- |
-| [Mapillary](https://help.mapillary.com/hc/en-us/articles/115001770409-CC-BY-SA-license-for-open-data) and [KartaView](https://kartaview.org/terms) | Street-level reference for sidewalk materials and furniture. Verify captures along each route and credit contributors under the applicable licence. |
-| [OpenAerialMap](https://openaerialmap.org/about/) | Openly licensed aerial reference where there is recent, sufficiently detailed coverage. |
-| [HERE Traffic Flow](https://docs.here.com/traffic-api/docs/flow) and [TomTom Traffic Flow](https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/traffic-flow/vector-flow-tiles) | Live speed and congestion by road segment. A lab can compare confidence, road matching, and coverage across Toronto, Montréal, Calgary, and Vancouver. Historical counts remain the baseline for vehicle density. |
+The [Kensington walk manifest](../data/marble/kensington-walk.json) is a text draft based on independent references. Source pages are kept as credits. To send media, set a source's `use` to `image`, `panorama`, or `video`, supply a fetchable `mediaUrl` or previously uploaded `mediaAssetId`, and mark `rightsReviewed` only after checking permissions. Several images should show the same scene. Add `azimuth` in degrees when known. For an individual location, use `collection: "places"` and its Patria place ID as the target. [Marble input examples](https://docs.worldlabs.ai/api/world-generation-examples)
 
-## World models
+```sh
+node scripts/generate-marble.mjs plan data/marble/kensington-walk.json
+node --env-file=.env scripts/generate-marble.mjs submit data/marble/kensington-walk.json
+node --env-file=.env scripts/generate-marble.mjs status YOUR_OPERATION_ID
+```
 
-- **World Labs Marble** accepts images, video, or text and can export a persistent scene as a Gaussian splat, with a collider mesh for navigation. It is a candidate for a small, separately rendered street scene. [World API](https://docs.worldlabs.ai/api) [Export format](https://docs.worldlabs.ai/api/reference/worlds/export)
-- **Google DeepMind Genie 4** is an interactive world model in research preview. Use it to evaluate motion and scene feel when access is available. Google documents limitations in geographic accuracy and consistency over time. [Genie 4](https://deepmind.google/models/genie/)
+The plan command prints the request locally. Submitting uses World Labs credits and requires `WLT_API_KEY` in the local `.env`. It creates a private world. Save the operation ID and check its status to retrieve the world ID and Marble link. [World API quickstart](https://docs.worldlabs.ai/api)
 
-Start with a single block of Kensington Avenue. Use a Patria render as the starting composition and add open or owner-captured references with suitable rights. Compare the resulting scene with the same OpenStreetMap route and walker. Check whether sidewalks and turns stay aligned, whether the chase camera stays clear of buildings, and whether the scene loads smoothly on a phone. Use mapped coordinates for the walk and label generated details as illustrative.
+Review walkability, geography, source credits, and mobile performance in Marble. After approving and sharing a world, add its ID and source credits under the target in `public/assets/marble-worlds.json`. Patria shows **Explore in Marble** only for cataloged scenes.
+
+```json
+{
+  "walks": {
+    "kensington": {
+      "id": "REVIEWED_WORLD_ID",
+      "sources": [
+        { "url": "https://www.openstreetmap.org/copyright", "credit": "OpenStreetMap contributors", "license": "ODbL 1.0" }
+      ]
+    }
+  },
+  "places": {}
+}
+```

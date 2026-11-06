@@ -128,6 +128,11 @@ export async function handleApi(request,env={}){
  if(request.method!=='GET')return json({error:'Use GET for this endpoint.'},405);
  const origin=request.headers.get('Origin');if(origin&&origin!==url.origin)return json({error:'Use Patria to access this service.'},403);
  if(url.pathname==='/api/session')return json({user:getUser(request),hosted:env.PATRIA_LOCAL!=='true'});
+ if (url.pathname === '/api/map-config') {
+   const browserKey = env.GOOGLE_MAPS_BROWSER_KEY?.trim();
+   if (!browserKey) return json({ error: 'Google Maps setup is needed to display the map.' }, 503);
+   return json({ browserKey, mapId: env.GOOGLE_MAPS_MAP_ID?.trim() || 'e873743a69b2532eefe6dd55' });
+ }
  if (url.pathname === '/api/walk') {
    if (!rateAllowed(request)) return json({ error: 'Too many route requests. Try again in a minute.' }, 429);
    try {
