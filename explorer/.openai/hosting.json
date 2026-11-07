@@ -1,3 +1,5 @@
 {
-  "project_id": "appgprj_6ac3daea7ef8819182b76f4ed7ffa6c0"
+  "project_id": "appgprj_6ac3daea7ef8819182b76f4ed7ffa6c0",
+  "d1": "EVENTS_DB",
+  "capabilities": ["mcp"]
 }

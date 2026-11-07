@@ -1,0 +1,255 @@
+{
+  "venues": [
+    {
+      "name": "Nanaimo Museum",
+      "aliases": [
+        "Nanaimo Museum",
+        "Port of Nanaimo Centre"
+      ],
+      "address": "100 Museum Way",
+      "city": "Nanaimo",
+      "region": "BC",
+      "lat": 49.165002,
+      "lng": -123.936467,
+      "url": "https://nanaimomuseum.ca/locations/nanaimo-museum/",
+      "coordinateSource": "https://nanaimomuseum.ca/locations/nanaimo-museum/"
+    },
+    {
+      "name": "Vancouver Island Conference Centre",
+      "aliases": [
+        "VICC",
+        "Vancouver Island Conference Center",
+        "Shaw Auditorium",
+        "80 Commercial Street",
+        "101 Gordon Street"
+      ],
+      "address": "101 Gordon Street",
+      "city": "Nanaimo",
+      "region": "BC",
+      "lat": 49.1649042,
+      "lng": -123.9362529,
+      "url": "https://www.nanaimo.ca/business_report/bus_details.aspx?licence=133804",
+      "coordinateSource": "https://www.nanaimo.ca/business_report/bus_details.aspx?licence=133804"
+    },
+    {
+      "name": "Remai Modern",
+      "aliases": [
+        "Marquee Gallery",
+        "Cameco Learning Studio",
+        "Cameco Learning Studio at Remai Modern",
+        "SaskTel Theatre at Remai Modern"
+      ],
+      "address": "102 Spadina Crescent East",
+      "city": "Saskatoon",
+      "region": "SK",
+      "lat": 52.12306,
+      "lng": -106.66755,
+      "url": "https://remaimodern.org/visit-us/",
+      "coordinateSource": "https://www.openstreetmap.org/way/298718480"
+    },
+    {
+      "name": "Frances Morrison Central Library",
+      "aliases": [
+        "Frances Morrison Library",
+        "Frances Morrison Central",
+        "Frances Morrison"
+      ],
+      "address": "311 23rd Street East",
+      "city": "Saskatoon",
+      "region": "SK",
+      "lat": 52.12954,
+      "lng": -106.66043,
+      "url": "https://saskatoonlibrary.ca/about/locations/fmcl/",
+      "coordinateSource": "https://www.openstreetmap.org/way/481920864"
+    },
+    {
+      "name": "Sporobole",
+      "aliases": [
+        "Sporobole centre en art actuel",
+        "Sporobole Art Centre"
+      ],
+      "address": "74 rue Albert",
+      "city": "Sherbrooke",
+      "region": "QC",
+      "lat": 45.40266,
+      "lng": -71.89021,
+      "url": "https://sporobole.org/contact/",
+      "coordinateSource": "https://www.openstreetmap.org/way/178844606"
+    },
+    {
+      "name": "Musée de la nature et des sciences de Sherbrooke",
+      "aliases": [
+        "Musée de la nature et des sciences",
+        "MNS²",
+        "MNS2",
+        "Musée de la nature et des sciences à Sherbrooke"
+      ],
+      "address": "225 rue Frontenac",
+      "city": "Sherbrooke",
+      "region": "QC",
+      "lat": 45.4033673,
+      "lng": -71.895639,
+      "url": "https://mns2.ca/renseignements/",
+      "coordinateSource": "https://mns2.ca/renseignements/"
+    },
+    {
+      "name": "Bibliothèque Éva-Sénécal",
+      "aliases": [
+        "Bibliothèque municipale Éva-Sénécal",
+        "Éva-Sénécal"
+      ],
+      "address": "450 rue Marquette",
+      "city": "Sherbrooke",
+      "region": "QC",
+      "lat": 45.39993,
+      "lng": -71.89687,
+      "url": "https://www.sherbrooke.ca/Fichiers/3337a882-4a53-e611-80ea-00155d09650f/Sites/333dd3d3-915d-e611-80ea-00155d09650f/Documents/Reglements%20municipaux/reglement-1300.pdf",
+      "coordinateSource": "https://www.openstreetmap.org/way/174268153"
+    },
+    {
+      "name": "Resurgo Place",
+      "aliases": [
+        "Place Resurgo",
+        "Moncton Museum",
+        "Transportation Discovery Centre",
+        "Musée de Moncton"
+      ],
+      "address": "20 Mountain Road",
+      "city": "Moncton",
+      "region": "NB",
+      "lat": 46.09404,
+      "lng": -64.77476,
+      "url": "https://www.moncton.ca/en/my-services-book-facility/resurgo-place",
+      "coordinateSource": "https://www.openstreetmap.org/way/297192297"
+    },
+    {
+      "name": "Capitol Theatre",
+      "aliases": [
+        "Théâtre Capitol",
+        "Capitol PC",
+        "Empress Theatre"
+      ],
+      "address": "811 Main Street",
+      "city": "Moncton",
+      "region": "NB",
+      "lat": 46.08832,
+      "lng": -64.77909,
+      "url": "https://capitol.nb.ca/en/tickets-events",
+      "coordinateSource": "https://www.openstreetmap.org/node/5042437823"
+    },
+    {
+      "name": "Aberdeen Cultural Centre",
+      "aliases": [
+        "Centre culturel Aberdeen",
+        "Bernard-LeBlanc Hall",
+        "Salle Bernard-LeBlanc"
+      ],
+      "address": "140 Botsford Street",
+      "city": "Moncton",
+      "region": "NB",
+      "lat": 46.09278,
+      "lng": -64.77778,
+      "url": "https://www.moncton.ca/en/guides-moncton-host-your-event-moncton-event-venues/venue-aberdeen-cultural-centre",
+      "coordinateSource": "https://www.openstreetmap.org/way/71495426"
+    },
+    {
+      "name": "Shipyards Park",
+      "aliases": [
+        "Shipyards Park Toboggan Hill",
+        "Frank Slim Building",
+        "Shipyards Park Whitehorse"
+      ],
+      "address": "100 Ogilvie Street",
+      "city": "Whitehorse",
+      "region": "YT",
+      "lat": 60.72824,
+      "lng": -135.05675,
+      "url": "https://www.whitehorse.ca/living-in-whitehorse/parks-recreation/parks/shipyards-park/",
+      "coordinateSource": "https://www.openstreetmap.org/way/289966857"
+    },
+    {
+      "name": "The Old Fire Hall",
+      "aliases": [
+        "Old Fire Hall",
+        "Old Firehall",
+        "The Old Firehall"
+      ],
+      "address": "1105 Front Street",
+      "city": "Whitehorse",
+      "region": "YT",
+      "lat": 60.71977,
+      "lng": -135.04969,
+      "url": "https://yukonartscentre.com/contact-us/",
+      "coordinateSource": "https://www.openstreetmap.org/way/289834530"
+    },
+    {
+      "name": "The Explorer Hotel",
+      "aliases": [
+        "Explorer Hotel"
+      ],
+      "address": "4825 49th Avenue",
+      "city": "Yellowknife",
+      "region": "NT",
+      "lat": 62.4576588,
+      "lng": -114.3727935,
+      "url": "https://www.explorerhotel.ca/",
+      "coordinateSource": "https://geolocator.api.geo.ca/?q=The%20Explorer%20Hotel%2C%20Yellowknife%2C%20NT&keys=nominatim"
+    },
+    {
+      "name": "Chateau Nova Yellowknife",
+      "aliases": [
+        "Chateau Nova",
+        "Château Nova"
+      ],
+      "address": "4571 48 Street",
+      "city": "Yellowknife",
+      "region": "NT",
+      "lat": 62.458797,
+      "lng": -114.3728482,
+      "url": "https://www.novahotels.ca/chateau-nova-yellowknife/",
+      "coordinateSource": "https://geolocator.api.geo.ca/?q=Chateau%20Nova%20Yellowknife%2C%20NT&keys=nominatim"
+    },
+    {
+      "name": "Franco-Centre",
+      "aliases": [
+        "Franco Centre",
+        "Franco-Centre unité #981"
+      ],
+      "address": "981 promenade Nunavut",
+      "city": "Iqaluit",
+      "region": "NU",
+      "lat": 63.7501731,
+      "lng": -68.5258199,
+      "url": "https://www.afnunavut.ca/location-du-franco-centre/",
+      "coordinateSource": "https://geolocator.api.geo.ca/?q=Franco-Centre%2C%20Iqaluit%2C%20NU&keys=nominatim"
+    },
+    {
+      "name": "Scott MacAulay Performing Arts Centre",
+      "aliases": [
+        "The Scott MacAulay Performing Arts Centre",
+        "Celtic Performing Arts Centre"
+      ],
+      "address": "619 Water Street East",
+      "city": "Summerside",
+      "region": "PE",
+      "lat": 46.3945911,
+      "lng": -63.7691844,
+      "url": "https://smpac.ca/venue/scott-macaulay-performing-arts-centre/",
+      "coordinateSource": "https://geolocator.api.geo.ca/?q=619%20Water%20Street%20East%2C%20Summerside%2C%20PE&keys=nominatim"
+    },
+    {
+      "name": "Halifax Citadel National Historic Site",
+      "aliases": [
+        "Halifax Citadel",
+        "Halifax Citadel National Historic Site, Halifax"
+      ],
+      "address": "5425 Sackville Street",
+      "city": "Halifax",
+      "region": "NS",
+      "lat": 44.647308,
+      "lng": -63.580392,
+      "url": "https://parks.canada.ca/lhn-nhs/ns/halifax/visit/directions",
+      "coordinateSource": "https://parks.canada.ca/~/link.aspx?_id=E1923D84BC4546AA96BEAB1F63F91C1E&_z=z"
+    }
+  ]
+}

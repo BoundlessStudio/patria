@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#193f3b">
-  <meta name="description" content="Discover local cafés, parks, and shops with Patria. Explore neighborhoods on the map and plan your next walk.">
+  <meta name="description" content="Find dated local events and activities near a Canadian address or map pin.">
   <title>Patria — Find your kind of nearby</title>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Patria">
   <meta property="og:title" content="Patria — Find your kind of nearby">
-  <meta property="og:description" content="Discover local cafés, parks, and shops with Patria. Explore neighborhoods on the map and plan your next walk.">
+  <meta property="og:description" content="Find dated local events and activities near a Canadian address or map pin.">
   <meta property="og:url" content="https://patria.rgbknights.com/">
   <meta property="og:image" content="https://patria.rgbknights.com/assets/patria-social-card.jpg">
   <meta property="og:image:type" content="image/jpeg">
@@ -18,7 +18,7 @@
   <meta property="og:image:alt" content="Patria. Find your kind of nearby. An illustrated neighborhood with tree-lined streets, cafés, and people out for a walk.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Patria — Find your kind of nearby">
-  <meta name="twitter:description" content="Discover local cafés, parks, and shops with Patria. Explore neighborhoods on the map and plan your next walk.">
+  <meta name="twitter:description" content="Find dated local events and activities near a Canadian address or map pin.">
   <meta name="twitter:image" content="https://patria.rgbknights.com/assets/patria-social-card.jpg">
   <meta name="twitter:image:alt" content="Patria. Find your kind of nearby. An illustrated neighborhood with tree-lined streets, cafés, and people out for a walk.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23193f3b'/%3E%3Cpath d='M9 24V11a7 7 0 1 1 7 7h-3' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='11' r='2' fill='%23f87955'/%3E%3C/svg%3E">
@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="home.css">
   <link rel="stylesheet" href="map.css">
+  <script src="events.js" defer></script>
   <script src="app.js" defer></script>
   <script src="pages.js" defer></script>
 </head>
@@ -37,28 +38,28 @@
     <a class="brand" href="./" aria-label="Patria home"><span class="brand-mark" aria-hidden="true">p<span></span></span>patria<span class="brand-period">.</span></a>
     <nav class="home-nav" aria-label="Website navigation"><a href="/#experience">The experience</a><a href="/#how-it-works">How it works</a><a href="/#neighborhoods">Neighborhoods</a></nav>
     <nav class="nav explorer-nav" aria-label="Explorer navigation">
-      <button class="nav-item active" data-view="explore" aria-pressed="true">Explore</button>
-      <button class="nav-item" data-view="walks" aria-pressed="false">Neighborhood walks</button>
+      <button class="nav-item" data-view="events" aria-pressed="false">Happening nearby</button>
+      <button class="nav-item active" data-view="explore" aria-pressed="true">Places</button>
       <button class="nav-item" data-view="saved" aria-pressed="false">Saved places <span id="saved-count">0</span></button>
     </nav>
     <button class="about-button" id="about-button"><span data-icon="compass"></span><span>Made for the curious</span></button>
-    <a class="signin-link" href="/signin-with-chatgpt?return_to=%2Fonboarding" target="_top">Sign in</a>
+    <a class="signin-link" href="/signin-with-chatgpt?return_to=%2Fexplore" target="_top">Sign in</a>
   </header>
   <main id="home-view" class="home-view">
     <section class="home-hero">
       <img class="hero-art" src="assets/hero-illustration-v2.webp" alt="An illustrated neighborhood with leafy paths, cafés, and people enjoying a sunny afternoon" fetchpriority="high">
-      <div class="hero-copy"><span class="hero-eyebrow">FOR THE EVERYDAY EXPLORER</span><h1>Find your place.<br>Beyond your front door.</h1><p>Discover the streets, little favorites, and everyday moments<br>that make a neighborhood feel like yours.</p><a class="dark-button hero-cta" href="/signin-with-chatgpt?return_to=%2Fonboarding" target="_top">Explore your neighborhood</a><a class="hero-preview" href="/preview">Take a look around first</a></div>
+      <div class="hero-copy"><span class="hero-eyebrow">FOR THE EVERYDAY EXPLORER</span><h1>What’s happening<br>nearby?</h1><p>Find local events, classes, markets, and things to do near any Canadian address or map pin.</p><a class="dark-button hero-cta" href="/signin-with-chatgpt?return_to=%2Fexplore" target="_top">Happening nearby</a><a class="hero-preview" href="/preview">Take a look around first</a></div>
       <div class="hero-note"><span data-icon="compass"></span>For wherever you live. And wherever you’re curious.</div>
     </section>
-    <section id="experience" class="home-section experience-section"><div class="experience-copy"><span class="eyebrow">MORE THAN A PIN ON A MAP</span><h2>Get a feel for<br>the life around you.</h2><p>The coffee spot you keep walking past. A quiet park two streets over. A neighborhood you’ve always meant to visit.</p><p>Choose a starting point and see what’s nearby, from familiar favorites to places you’ve never been.</p><a class="text-link" href="/preview">Meet your next little discovery</a></div><div class="experience-card"><div class="experience-image"><img src="assets/kensington-market.jpg" alt="Independent shops on Kensington Avenue in Toronto" loading="lazy"><span>Kensington Market, Toronto</span></div><div class="experience-card-copy"><span class="eyebrow">A DIFFERENT KIND OF AFTERNOON</span><h3>A coffee. A wander. A new favorite.</h3><div class="experience-tags"><span data-icon="coffee"></span>Coffee stops<span data-icon="parks"></span>Green spaces<span data-icon="walk"></span>Local walks</div><a class="dark-button" href="/preview?area=kensington">Explore Kensington</a></div></div></section>
-    <section id="how-it-works" class="how-section"><div class="home-section"><span class="eyebrow">YOUR NEIGHBORHOOD, YOUR WAY</span><h2>One starting point.<br>A whole world around it.</h2><div class="steps-grid"><article><span class="step-number">01</span><h3>Pick your starting point</h3><p>Your street, a neighborhood nearby, or somewhere entirely new. Start with any place you’re curious about.</p></article><article><span class="step-number">02</span><h3>Make it a little more you</h3><p>Tell us what catches your eye. Coffee and food, a little culture, an independent shop, or room to breathe.</p></article><article><span class="step-number">03</span><h3>Go beyond the map</h3><p>Connect a few nearby places into a walk you can take at your own pace.</p></article></div></div></section>
+    <section id="experience" class="home-section experience-section"><div class="experience-copy"><span class="eyebrow">MORE THAN A PIN ON A MAP</span><h2>Get a feel for<br>the life around you.</h2><p>The coffee spot you keep walking past. A quiet park two streets over. A neighborhood you’ve always meant to visit.</p><p>Choose a starting point and see what’s nearby, from familiar favorites to places you’ve never been.</p><a class="text-link" href="/preview">Meet your next little discovery</a></div><div class="experience-card"><div class="experience-image"><img src="assets/kensington-market.jpg" alt="Independent shops on Kensington Avenue in Toronto" loading="lazy"><span>Kensington Market, Toronto</span></div><div class="experience-card-copy"><span class="eyebrow">A DIFFERENT KIND OF AFTERNOON</span><h3>A coffee. A wander. A new favorite.</h3><div class="experience-tags"><span data-icon="coffee"></span>Coffee stops<span data-icon="parks"></span>Green spaces<span data-icon="culture"></span>Local events</div><a class="dark-button" href="/preview?area=kensington">Explore Kensington</a></div></div></section>
+    <section id="how-it-works" class="how-section"><div class="home-section"><span class="eyebrow">YOUR NEIGHBORHOOD, YOUR WAY</span><h2>One starting point.<br>A whole world around it.</h2><div class="steps-grid"><article><span class="step-number">01</span><h3>Pick your starting point</h3><p>Your street, a neighborhood nearby, or somewhere entirely new. Start with any place you’re curious about.</p></article><article><span class="step-number">02</span><h3>See what’s on</h3><p>Check today, this weekend, or the next few days for classes, events, and activities near your pin.</p></article><article><span class="step-number">03</span><h3>Decide where to go</h3><p>Check the publisher’s listing, see the venue on Street View, or open directions.</p></article></div></div></section>
     <section id="neighborhoods" class="home-section neighborhoods-section"><div class="neighborhoods-heading"><div><span class="eyebrow">A FEW PLACES TO FIND YOURSELF</span><h2>Let curiosity choose<br>the next corner.</h2></div><p>Start with one of our Toronto collections.<br>After sign-in, search wherever you’d like to explore.</p></div><div class="neighborhood-grid"><a href="/preview?area=kensington" class="neighborhood-home-card"><img src="assets/kensington-market.jpg" alt="Shops along Kensington Avenue" loading="lazy"><div><h3>Kensington Market</h3><p>Colorful streets. Independent spirits.</p><span>TORONTO · COFFEE & CULTURE</span></div></a><a href="/preview?area=trinity" class="neighborhood-home-card"><img src="assets/trinity-bellwoods.jpg" alt="The green bowl of Trinity Bellwoods Park" loading="lazy"><div><h3>Trinity Bellwoods</h3><p>A book, a coffee, a little green.</p><span>TORONTO · PARKS & SMALL FINDS</span></div></a><a href="/preview?area=distillery" class="neighborhood-home-card"><img src="assets/distillery-district.webp" alt="The brick pedestrian lanes of the Distillery District" loading="lazy"><div><h3>Distillery District</h3><p>Old brick. New perspectives.</p><span>TORONTO · ART & SLOW WANDERS</span></div></a></div></section>
-    <section class="home-footer-hero"><img src="assets/footer-illustration-v2.webp" alt="An illustrated golden-hour neighborhood park with people strolling along a path" loading="lazy"><div><span class="hero-eyebrow">YOU DON’T HAVE TO MOVE TO FIND SOMETHING NEW</span><h2>Your next favorite<br>might be around the corner.</h2><a class="dark-button hero-cta" href="/signin-with-chatgpt?return_to=%2Fonboarding" target="_top">Let’s see what’s nearby</a></div></section>
+    <section class="home-footer-hero"><img src="assets/footer-illustration-v2.webp" alt="An illustrated golden-hour neighborhood park with people strolling along a path" loading="lazy"><div><span class="hero-eyebrow">YOU DON’T HAVE TO MOVE TO FIND SOMETHING NEW</span><h2>Your next favorite<br>might be around the corner.</h2><a class="dark-button hero-cta" href="/signin-with-chatgpt?return_to=%2Fexplore" target="_top">Let’s see what’s nearby</a></div></section>
     <footer class="home-footer"><a class="brand" href="/">patria<span class="brand-period">.</span></a><p>A little curiosity. A little closer to home.</p><div><a href="/privacy">Privacy</a><a href="/terms">Terms</a><button id="home-credits">Photo credits</button></div><span>© 2026 Patria</span></footer>
   </main>
   <main id="onboarding-view" class="onboarding-view" hidden>
     <div class="onboarding-art"><img src="assets/hero-illustration-v2.webp" alt="A welcoming illustrated neighborhood"><div><span class="eyebrow">YOUR NEXT LITTLE ADVENTURE</span><h2>Every neighborhood <br>has a story. <br>Find your part in it.</h2><p>A few small choices. A world worth exploring.</p></div></div>
-    <section class="wizard-panel" aria-label="Personalize your neighborhood experience"><div class="wizard-progress"><span id="wizard-step-label">Step 1 of 3</span><div><span class="active"></span><span></span><span></span></div></div><div id="wizard-content" tabindex="-1"></div><div class="wizard-controls"><button id="wizard-back" class="text-button" hidden>Back</button><button id="wizard-next" class="dark-button" disabled>Continue</button></div><p class="wizard-footnote">Your preferences stay on this device. Change them whenever you like.</p></section>
+    <section class="wizard-panel" aria-label="Personalize your neighborhood experience"><div class="wizard-progress"><span id="wizard-step-label">Step 1 of 2</span><div><span class="active"></span><span></span></div></div><div id="wizard-content" tabindex="-1"></div><div class="wizard-controls"><button id="wizard-back" class="text-button" hidden>Back</button><button id="wizard-next" class="dark-button" disabled>Continue</button></div><p class="wizard-footnote">Your preferences stay on this device. Change them whenever you like.</p></section>
   </main>
   <main class="workspace" id="explorer-view" hidden>
     <aside class="explorer-panel" id="explorer-panel" tabindex="-1">
@@ -71,7 +72,16 @@
       <div class="search-results" id="search-results" hidden></div>
       <div class="location-row"><button id="location-button"><span data-icon="pin"></span><span id="location-label">Kensington Market, Toronto</span><span data-icon="chevron"></span></button><button id="locate-button" aria-label="Explore near my location" title="Explore near me"><span data-icon="locate"></span></button></div>
       <section class="interests-section" aria-label="Place interests"><div class="section-label">What are you in the mood for?</div><div class="interests" id="interests"></div></section>
-      <section id="walk-feature" class="walk-feature"></section>
+<section class="event-panel" id="event-panel" aria-label="Happening nearby" hidden>
+        <p id="event-preview-label" class="event-preview-label" hidden>Local preview · live publisher data from this device’s index</p>
+        <div class="event-filters" id="event-filters" hidden>
+          <label>When <select id="event-window"><option value="7d">Next 7 days</option><option value="today">Today</option><option value="weekend">This weekend</option><option value="14d">Next 14 days</option><option value="30d">Next 30 days</option></select></label>
+          <label>Within <select id="event-radius"><option value="1200">1.2 km</option><option value="2500">2.5 km</option><option value="5000">5 km</option></select></label>
+        </div>
+        <p id="event-status" role="status" aria-live="polite"></p>
+        <div class="event-actions"><button type="button" class="text-button" id="event-widen" hidden></button><button type="button" class="text-button" id="event-retry" hidden>Check again</button></div>
+        <div id="event-cards" class="event-cards"></div>
+      </section>
       <section class="places-section"><div class="section-heading"><h2 id="list-title">Worth a little wander</h2><span id="result-count"></span></div><p class="list-context" id="list-context">A few good places to start. Make the day your own.</p><div id="places-list" class="places-list"></div></section>
       <footer class="panel-footer"><span data-icon="globe"></span><span id="data-note">Curated Toronto collection</span><button id="sources-button">About our places</button></footer>
     </aside>
@@ -90,14 +100,13 @@
       <div class="map-tools"><button id="zoom-in" aria-label="Zoom in" disabled>+</button><button id="zoom-out" aria-label="Zoom out" disabled>−</button></div>
       <div class="map-north" aria-hidden="true">N<span>↑</span></div>
       <div class="detail-card" id="detail-card" hidden></div>
-      <div class="tour-card" id="tour-card" hidden></div>
       <button id="street-view-button" class="dark-button street-view-launch" type="button" disabled><span data-icon="street"></span>Street View</button>
       <button id="street-view-back" class="dark-button street-view-back" type="button" hidden>Back to map</button>
     </section>
   </main>
   <dialog id="neighborhood-dialog" class="dialog"><button class="dialog-close" data-close aria-label="Close neighborhood selection"><span data-icon="close"></span></button><span class="eyebrow">A DIFFERENT POINT OF VIEW</span><h2>Where to next?</h2><p>Try one of these Toronto neighborhoods, or search any location.</p><div id="neighborhood-options"></div><button class="text-button" id="search-instead">Search somewhere else</button></dialog>
-  <dialog id="about-dialog" class="dialog about-dialog"><button class="dialog-close" data-close aria-label="Close about Patria"><span data-icon="close"></span></button><span class="eyebrow">FOR LOCALS. FOR VISITORS. FOR YOU.</span><h2>Curiosity belongs<br>to everyone.</h2><p>Patria helps you explore the life around a place, whether you’ve lived there for years or just arrived.</p><div class="about-block"><h3>Real places, with a little context.</h3><p>Toronto collections use tourism, city, and business sources. Google Maps supplies the map, live traffic, and Street View. Location search and nearby discovery use OpenStreetMap data. Check a venue’s details before visiting.</p><p>Distances are straight-line estimates. Walks show a suggested stop sequence. Google Maps supplies walking directions. Saved places and your exploration preferences stay on this device.</p></div><div class="about-links"><a href="https://www.destinationtoronto.com/neighbourhoods/westside/kensington-market/" target="_blank" rel="noopener noreferrer">Destination Toronto</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a><a href="https://maps.google.com/" target="_blank" rel="noopener noreferrer">Google Maps</a><a href="https://heymirai.ai/" target="_blank" rel="noopener noreferrer">Experience inspiration: Mirai</a></div><div id="photo-credits" class="photo-credits"></div></dialog>
-  <dialog id="signin-dialog" class="dialog"><button class="dialog-close" data-close aria-label="Close sign-in information"><span data-icon="close"></span></button><span class="eyebrow">A LITTLE MORE YOU</span><h2>Make yourself<br>at home.</h2><p>Sign in to choose a starting point and make your neighborhood experience your own.</p><a class="dark-button" id="platform-signin" href="/signin-with-chatgpt?return_to=%2Fonboarding" target="_top">Sign in with ChatGPT</a><p id="signin-info" class="wizard-footnote"></p></dialog>
+  <dialog id="about-dialog" class="dialog about-dialog"><button class="dialog-close" data-close aria-label="Close about Patria"><span data-icon="close"></span></button><span class="eyebrow">FOR LOCALS. FOR VISITORS. FOR YOU.</span><h2>Curiosity belongs<br>to everyone.</h2><p>Patria helps you explore the life around a place, whether you’ve lived there for years or just arrived.</p><div class="about-block"><h3>Real places, with a little context.</h3><p>Toronto collections use tourism, city, and business sources. Google Maps supplies the map, live traffic, and Street View. Location search and nearby discovery use OpenStreetMap data. Check a venue’s details before visiting.</p><p>Distances are straight-line estimates. Event cards link to the publisher for dates and bookings. Google Maps supplies directions and Street View. Saved places and your exploration preferences stay on this device.</p></div><div class="about-links"><a href="https://www.destinationtoronto.com/neighbourhoods/westside/kensington-market/" target="_blank" rel="noopener noreferrer">Destination Toronto</a><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a><a href="https://maps.google.com/" target="_blank" rel="noopener noreferrer">Google Maps</a><a href="https://heymirai.ai/" target="_blank" rel="noopener noreferrer">Experience inspiration: Mirai</a></div><div id="photo-credits" class="photo-credits"></div></dialog>
+  <dialog id="signin-dialog" class="dialog"><button class="dialog-close" data-close aria-label="Close sign-in information"><span data-icon="close"></span></button><span class="eyebrow">A LITTLE MORE YOU</span><h2>Make yourself<br>at home.</h2><p>Sign in to choose a starting point and make your neighborhood experience your own.</p><a class="dark-button" id="platform-signin" href="/signin-with-chatgpt?return_to=%2Fexplore" target="_top">Sign in with ChatGPT</a><p id="signin-info" class="wizard-footnote"></p></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

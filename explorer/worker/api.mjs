@@ -1,3 +1,5 @@
+import { handleEventMaintenance, nearbyEvents } from './events/service.mjs';
+
 const placeTags = {
   coffee: ['amenity.cafe', 'shop.coffee'],
   food: ['amenity.restaurant', 'amenity.fast_food', 'shop.bakery'],
@@ -107,26 +109,40 @@ function placeFromFeature(feature) {
     sourceLabel: 'OpenStreetMap',
   };
 }
-async function photonFeatures(env, path, params) {
+async function photonFeatures(env, path, params, timeout = 10000) {
   const url = new URL(path, env.PATRIA_PHOTON_URL || 'https://photon.komoot.io');
   url.search = new URLSearchParams(params);
   const response = await fetch(url, {
     headers: { Accept: 'application/json' },
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(timeout),
   });
   if (!response.ok) throw new Error('Photon request failed.');
   const { features } = await response.json();
   if (!Array.isArray(features)) throw new Error('Invalid Photon response.');
   return features;
 }
+
+async function canadianLocations(q) {
+  const url = new URL('https://geolocator.api.geo.ca/');
+  url.search = new URLSearchParams({ q, keys: 'locate,geonames,nominatim' });
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(5000) });
+  if (!response.ok) throw new Error('Canadian location search failed.');
+  const rows = await response.json();
+  if (!Array.isArray(rows)) throw new Error('Invalid Canadian location response.');
+  return rows.filter(row => row.name && row.province && validCoordinates(row.lat, row.lng)).slice(0, 5).map(row => ({
+    name: row.name.split(',')[0], address: row.name.includes(row.province) ? row.name : `${row.name}, ${row.province}`,
+    lat: row.lat, lng: row.lng,
+  }));
+}
 function rateAllowed(request){const ip=request.headers.get('CF-Connecting-IP')||'local';const window=Math.floor(Date.now()/60000);if(counters.size>5000)counters.clear();let c=counters.get(ip);if(!c||c.window!==window){c={window,count:0};counters.set(ip,c);}return ++c.count<=30;}
 // Identity headers are supplied and verified by Sites dispatch, never by browser input.
 export function getUser(request){const id=request.headers.get('oai-authenticated-user-id'),email=request.headers.get('oai-authenticated-user-email');if(!id||!email)return null;let name=email;const value=request.headers.get('oai-authenticated-user-full-name');if(value&&request.headers.get('oai-authenticated-user-full-name-encoding')==='percent-encoded-utf-8'){try{name=decodeURIComponent(value);}catch{}}return {id,name};}
 export function requireUserRoute(request){const u=new URL(request.url);if(['/onboarding','/explore'].includes(u.pathname)&&!getUser(request))return Response.redirect(new URL('/signin-with-chatgpt?return_to='+encodeURIComponent(u.pathname+u.search),u.origin),302);return null;}
-export async function handleApi(request,env={}){
- const url=new URL(request.url);if(!url.pathname.startsWith('/api/'))return null;
- if(request.method!=='GET')return json({error:'Use GET for this endpoint.'},405);
+export async function handleApi(request,env={},ctx){
+ const url=new URL(request.url);if(!url.pathname.startsWith('/api/')&&url.pathname!=='/mcp')return null;
  const origin=request.headers.get('Origin');if(origin&&origin!==url.origin)return json({error:'Use Patria to access this service.'},403);
+ if(url.pathname==='/mcp'||url.pathname==='/api/events/maintenance')return handleEventMaintenance(request,env,getUser(request));
+ if(request.method!=='GET')return json({error:'Use GET for this endpoint.'},405);
  if(url.pathname==='/api/session')return json({user:getUser(request),hosted:env.PATRIA_LOCAL!=='true'});
  if (url.pathname === '/api/map-config') {
    const browserKey = env.GOOGLE_MAPS_BROWSER_KEY?.trim();
@@ -141,16 +157,26 @@ export async function handleApi(request,env={}){
      return json({ error: 'Walking routes are temporarily unavailable. Try again shortly.' }, 502);
    }
  }
- if(!['/api/search','/api/nearby'].includes(url.pathname))return json({error:'Not found.'},404);
- if(!getUser(request))return json({error:'Sign in to explore any neighborhood.'},401);
+ const localPreview=env.PATRIA_LOCAL==='true'&&['/api/local/search','/api/local/events/nearby'].includes(url.pathname);
+ const endpoint=localPreview?url.pathname.replace('/api/local/','/api/'):url.pathname;
+ if(!['/api/search','/api/nearby','/api/events/nearby'].includes(endpoint))return json({error:'Not found.'},404);
+ if(!getUser(request)&&!localPreview)return json({error:'Sign in to explore any neighborhood.'},401);
  if(!rateAllowed(request))return json({error:'A few too many searches. Please wait a minute and try again.'},429);
+ if(endpoint==='/api/events/nearby')return nearbyEvents(url.searchParams,env,ctx);
  try {
-   if (url.pathname === '/api/search') {
+   if (endpoint === '/api/search') {
      const q = url.searchParams.get('q')?.trim();
      if (!q || q.length > 180) return json({error:'Enter a city, neighborhood, or address (up to 180 characters).'}, 400);
-     const features = await photonFeatures(env, '/api/', { q, limit: 5 });
-     const locations = features.map(locationFromFeature).filter(location => location?.name);
-     return json({ locations, provider: 'osm' });
+     const country = url.searchParams.get('country');
+     if (country !== null && country !== 'CA') return json({ error: 'Choose a Canadian location.' }, 400);
+     try {
+       const features = await photonFeatures(env, '/api/', { q, limit: 5, ...(country ? { countrycode: country } : {}) }, country ? 2500 : 10000);
+       const locations = features.map(locationFromFeature).filter(location => location?.name);
+       return json({ locations, provider: 'osm' });
+     } catch (error) {
+       if (country !== 'CA') throw error;
+       return json({ locations: await canadianLocations(q), provider: 'nrcan' });
+     }
    }
 
    const latitude = url.searchParams.get('lat')?.trim();

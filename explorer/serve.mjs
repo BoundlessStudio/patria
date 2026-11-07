@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { handleApi, requireUserRoute } from './worker/api.mjs';
+import { openLocalEvents } from './scripts/local-events.mjs';
+import { seedRegistry } from './worker/events/registry.mjs';
 try {
   process.loadEnvFile(new URL('./.env', import.meta.url));
 } catch (error) {
@@ -10,11 +12,15 @@ try {
 }
 const root = fileURLToPath(new URL('./public/', import.meta.url)).replace(/[\\/]$/, '');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.txt': 'text/plain', '.json': 'application/json' };
+const EVENTS_DB = openLocalEvents();
+await seedRegistry(EVENTS_DB);
+const env = { ...process.env, EVENTS_DB, PATRIA_LOCAL: 'true' };
+const context = { waitUntil(promise) { promise.catch(() => {}); } };
 http.createServer(async (req, res) => {
   try {
     const headers=new Headers(req.headers);for(const key of [...headers.keys()])if(key.startsWith('oai-authenticated-'))headers.delete(key);
     const request=new Request(new URL(req.url,'http://127.0.0.1:4173'), { method:req.method,headers });
-    const api = await handleApi(request, { ...process.env,PATRIA_LOCAL:'true' });
+    const api = await handleApi(request, env, context);
     if(api){res.writeHead(api.status,Object.fromEntries(api.headers));res.end(Buffer.from(await api.arrayBuffer()));return;}
     const gate=requireUserRoute(request);if(gate){res.writeHead(302,{Location:gate.headers.get('Location')});res.end();return;}
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);

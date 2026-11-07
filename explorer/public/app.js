@@ -42,7 +42,14 @@ const curated = [
  {id:'soma',area:'distillery',name:'SOMA Chocolatemaker',category:'food',lat:43.6500,lng:-79.3598,address:'32 Tank House Lane',description:'Chocolate made with curiosity about the cacao bean. Stop in the district’s chocolate shop or explore its tasting experiences.',source:'https://www.somachocolate.com/pages/tastings',sourceLabel:'SOMA Chocolatemaker'},
  {id:'young',area:'distillery',name:'Young Centre',category:'culture',lat:43.6508,lng:-79.3574,address:'50 Tank House Lane',description:'A performing arts stop in the historic district. Explore the program and plan a return for a performance.',source:'https://soulpepper.ca/',sourceLabel:'Young Centre'}
 ];
-const state={area:neighborhoods[0],center:neighborhoods[0].center,places:curated.filter(p=>p.area==='kensington'),view:'explore',category:'all',selected:null,tour:null,loading:false,error:'',request:0};
+const localEventsPreview = location.pathname === '/preview' && new URL(location.href).searchParams.get('events') === '1'
+ && ['127.0.0.1', 'localhost'].includes(location.hostname);
+const liveEventMode = location.pathname === '/explore' || localEventsPreview;
+const canadaOverview = { name: 'Choose a starting point', center: [56.13, -106.35] };
+const startingArea = liveEventMode ? canadaOverview : neighborhoods[0];
+const state = { area: startingArea, center: startingArea.center, hasStart: !liveEventMode,
+ places: liveEventMode ? [] : curated.filter(place => place.area === startingArea.id),
+ view: liveEventMode ? 'events' : 'explore', category: 'all', selected: null, loading: false, error: '', request: 0 };
 const neighborhoodTilt = 50;
 const neighborhoodZoom = 17.6;
 const neighborhoodRange = 820;
@@ -50,9 +57,10 @@ const terrainSampleHeight = 1000;
 const photoSurface = $('#map-photo');
 const standardSurface = $('#map-standard');
 let mapId, mapLayer, layerRequest = 0, googleFailed = false;
-let map, standardMapReady, AdvancedMarkerElement, routeLine, traffic, streetService, streetSource, streetPreference;
-let photoMap, photoLibrary, photoPin, photoUnavailable = false, photoMarkers = [], photoWalk, photoAnchor, photoFlight, photoLoadingTimer;
+let map, standardMapReady, AdvancedMarkerElement, traffic, streetService, streetSource, streetPreference;
+let photoMap, photoLibrary, photoPin, photoUnavailable = false, photoMarkers = [], photoAnchor, photoFlight, photoLoadingTimer;
 let streetRequest = 0, streetInvoker, markers = [], searchController, nearbyController, toastTimer;
+let startSelection = 0;
 let marbleWorlds;
 let saved=[],savedKey='patria-saved:preview',preferredInterests=[]; function configureSaved(user){savedKey='patria-saved:'+(user?.id||'preview');try{saved=JSON.parse(localStorage.getItem(savedKey)||'[]').filter(p=>p&&typeof p.id==='string'&&(p.provider==='google'||(typeof p.name==='string'&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)))).slice(0,100);}catch{saved=[];}render();}
 function persist(){try{localStorage.setItem(savedKey,JSON.stringify(saved));}catch{toast('Saved for this visit. Your browser’s storage is unavailable.');}}
@@ -115,7 +123,7 @@ async function initializeGoogleMap() {
   script.async = true;
   document.head.append(script);
  });
- if (!googleFailed) await setLayer('photo');
+ if (!googleFailed) await setLayer(liveEventMode && !state.hasStart ? 'styled' : 'photo');
 }
 
 function showMapSurface() {
@@ -135,9 +143,8 @@ async function createPhotoMap() {
  if (googleFailed) return;
  photoLibrary = library;
  photoPin = PinElement;
- const [lat, lng] = neighborhoods[0].center;
+ const [lat, lng] = state.center;
  photoAnchor = { lat, lng };
- // Seed the camera above Toronto while the renderer loads its terrain.
  photoMap = new library.Map3DElement({
   center: { lat, lng, altitude: 105 }, range: neighborhoodRange, tilt: neighborhoodTilt,
   mode: 'HYBRID', defaultUIHidden: true, description: 'Photorealistic neighborhood map',
@@ -224,7 +231,6 @@ async function createStandardMap() {
  });
  AdvancedMarkerElement = marker.AdvancedMarkerElement;
  traffic = new maps.TrafficLayer();
- routeLine = new maps.Polyline({ strokeColor: '#edb979', strokeOpacity: 0.95, strokeWeight: 4 });
  streetService = new street.StreetViewService();
  streetSource = street.StreetViewSource.OUTDOOR;
  streetPreference = street.StreetViewPreference.NEAREST;
@@ -242,7 +248,9 @@ async function createStandardMap() {
   }
  });
  map.addListener('dragstart', () => { if (mapLayer !== 'photo') streetRequest++; });
- map.addListener('dragend', () => { if (mapLayer !== 'photo') $('#search-area').hidden = false; });
+ const offerMapSearch = () => { if (mapLayer !== 'photo') $('#search-area').hidden = (map.getZoom() ?? 0) < 12; };
+ map.addListener('dragend', offerMapSearch);
+ map.addListener('zoom_changed', offerMapSearch);
  map.addListener('heading_changed', updateNorth);
 }
 
@@ -259,7 +267,7 @@ function mapView() {
  }
  const center = mapLayer && map?.getCenter()?.toJSON();
  const [lat, lng] = state.selected ? [state.selected.lat, state.selected.lng] : state.center;
- return { center: center || { lat, lng }, zoom: map?.getZoom() ?? neighborhoodZoom, heading: map?.getHeading() || 0 };
+ return { center: center || { lat, lng }, zoom: map?.getZoom() ?? (state.hasStart ? neighborhoodZoom : 4), heading: map?.getHeading() || 0 };
 }
 
 function mapCenter() {
@@ -370,10 +378,13 @@ function renderMarkers() {
  const origin = document.createElement('span');
  origin.className = 'map-origin';
  const [lat, lng] = state.center;
- const startingPoint = new AdvancedMarkerElement({ map, position: { lat, lng }, title: 'Your starting point', zIndex: 1 });
- startingPoint.append(origin);
- markers = [startingPoint];
- for (const place of state.tour?.stops || visiblePlaces()) {
+ markers = [];
+ if (state.hasStart) {
+  const startingPoint = new AdvancedMarkerElement({ map, position: { lat, lng }, title: 'Your starting point', zIndex: 1 });
+  startingPoint.append(origin);
+  markers.push(startingPoint);
+ }
+ for (const place of (state.view === 'events' ? eventMapVenues() : visiblePlaces())) {
   const selected = place.id === state.selected?.id;
   const pin = document.createElement('span');
   pin.className = selected ? 'map-pin selected' : 'map-pin';
@@ -382,7 +393,7 @@ function renderMarkers() {
    anchorLeft: '-50%', anchorTop: '-50%', zIndex: selected ? 3 : 2,
   });
   marker.append(pin);
-  marker.addEventListener('gmp-click', () => selectPlace(place));
+  marker.addEventListener('gmp-click', () => state.view === 'events' ? selectEventVenue(place) : selectPlace(place));
   markers.push(marker);
  }
 }
@@ -393,8 +404,8 @@ function renderPhotoMarkers() {
  const [lat, lng] = state.center;
  const origin = new Marker3DElement({ ...options, position: { lat, lng }, title: 'Your starting point' });
  origin.append(new photoPin({ background: '#c99551', borderColor: '#fff', glyphColor: '#fff', scale: 0.65 }));
- photoMarkers = [origin];
- for (const place of state.tour?.stops || visiblePlaces()) {
+ photoMarkers = state.hasStart ? [origin] : [];
+ for (const place of (state.view === 'events' ? eventMapVenues() : visiblePlaces())) {
   const selected = place.id === state.selected?.id;
   const marker = new Marker3DInteractiveElement({
    ...options, position: { lat: place.lat, lng: place.lng }, title: place.name, zIndex: selected ? 3 : 2,
@@ -402,40 +413,23 @@ function renderPhotoMarkers() {
   marker.append(new photoPin({
    background: selected ? '#cc6246' : '#183e39', borderColor: '#fff', glyphColor: '#fff', scale: selected ? 0.9 : 0.75,
   }));
-  marker.addEventListener('gmp-click', () => selectPlace(place));
+  marker.addEventListener('gmp-click', () => state.view === 'events' ? selectEventVenue(place) : selectPlace(place));
   photoMarkers.push(marker);
  }
  photoMap.append(...photoMarkers);
 }
 
-function renderWalk() {
- if (!mapLayer) return;
- const coordinates = state.tour?.stops.map(({ lat, lng }) => ({ lat, lng })) ?? [];
- if (mapLayer === 'photo') {
-  photoWalk?.remove();
-  if (coordinates.length > 1) {
-   const { Polyline3DElement, AltitudeMode } = photoLibrary;
-   photoWalk = new Polyline3DElement({
-    path: coordinates, altitudeMode: AltitudeMode.CLAMP_TO_GROUND,
-    strokeColor: '#edb979', strokeWidth: 5, outerColor: '#273b34', outerWidth: 0.4,
-    drawsOccludedSegments: true,
-   });
-   photoMap.append(photoWalk);
-  }
- } else {
-  routeLine.setPath(coordinates);
-  routeLine.setMap(coordinates.length > 1 ? map : null);
- }
-}
 function marbleLink(kind, target) {
  const world = marbleWorlds?.[kind]?.[target];
  if (typeof world?.id !== 'string' || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(world.id)) return '';
+ if (['events', 'venues'].includes(kind) && (!world.reviewed || !/^\d{4}-\d{2}-\d{2}$/.test(world.imageDate)
+   || !Array.isArray(world.sources) || !world.sources.some(source => source?.url && source.credit && source.license))) return '';
  const credits = Array.isArray(world.sources) ? world.sources.filter(source => source?.url && source.credit && source.license).map(source =>
   `<a href="${safeUrl(source.url)}" target="_blank" rel="noopener noreferrer">${esc(source.credit)} · ${esc(source.license)}</a>`
  ).join(' · ') : '';
  return `<div class="marble-preview">
   <a href="https://marble.worldlabs.ai/world/${world.id}" target="_blank" rel="noopener noreferrer">Explore in Marble ${icon('external')}</a>
-  <small>AI-generated scene${credits ? ' · ' + credits : ''}</small>
+  <small>AI-generated reconstruction${world.imageDate ? ' · Imagery ' + esc(world.imageDate) : ''}${credits ? ' · ' + credits : ''}</small>
  </div>`;
 }
 function renderLegacySaves() {
@@ -453,26 +447,37 @@ function renderLegacySaves() {
 }
 function render(){
  $('#saved-count').textContent=saved.length;
- $('.interests-section').hidden=state.view==='walks';
- document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===state.view);b.setAttribute('aria-pressed',String(b.dataset.view===state.view));});
- $('#interests').innerHTML=Object.entries(categoryNames).map(([k,v])=>`<button class="interest ${state.category===k?'active':''}" data-category="${k}" aria-pressed="${state.category===k}">${icon(k==='all'?'compass':k)}${v}</button>`).join('');
- $('#location-label').textContent=state.area.city?`${state.area.name}, ${state.area.city}`:state.area.name;$('#map-title').textContent=state.area.name;
- $('#data-note').textContent=state.area.id&&state.view!=='saved'?'Curated Toronto collection':'OpenStreetMap';
- const feature=$('#walk-feature');feature.hidden=state.view==='saved';
- if(state.area.image){feature.innerHTML=`<div class="walk-photo"><img src="assets/${esc(state.area.image)}" alt="${esc(state.area.alt)}"><span class="walk-badge">A NEIGHBORHOOD WALK</span></div><div class="walk-copy"><h3>${esc(state.area.walkTitle)}</h3><p>${esc(state.area.walkDescription)}</p><div class="walk-meta"><span>${icon('walk')}${state.area.stops.length} stops · Go at your pace</span><button data-start-tour>Explore the walk</button></div>${marbleLink('walks',state.area.id)}</div>`;}
- else{feature.innerHTML=`<div class="walk-copy"><span class="eyebrow">MAKE A LITTLE DETOUR</span><h3 style="margin-top:10px">A wander around ${esc(state.area.name)}</h3><p>Connect a few nearby places into a walk you can take at your own pace.</p><div class="walk-meta"><span>${icon('walk')}Up to 4 nearby stops</span><button data-start-tour ${state.loading||!state.places.length?'disabled':''}>Make a walk</button></div></div>`;}
+ const events = state.view === 'events';
+ $('.interests-section').hidden = events;
+ $('.places-section').hidden = events;
+ $('#event-panel').hidden = !events;
+ $('.panel-intro h1').textContent = events ? 'Happening nearby' : 'Explore nearby';
+ $('.panel-intro p').textContent = events ? 'Find events and activities within visiting distance.' : 'Browse places around the map.';
+ document.querySelectorAll('[data-view]').forEach(button => {
+  button.hidden = button.dataset.view === 'events' && !liveEventMode;
+  const active = button.dataset.view === state.view;
+  button.classList.toggle('active', active);
+  button.setAttribute('aria-pressed', String(active));
+ });
+ $('#location-label').textContent = state.area.city ? state.area.name + ', ' + state.area.city : state.area.name;
+ $('#map-title').textContent = state.area.name;
+ $('#data-note').textContent = events ? 'Publisher listings' : state.area.id && state.view !== 'saved' ? 'Curated Toronto collection' : 'OpenStreetMap';
+ $('.map-legend').firstChild.nextSibling.textContent = events ? 'Event venues' : 'Places to discover';
+ if (events) { renderEventsPanel(); renderMarkers(); renderEventVenue(); return; }
+ $('#interests').innerHTML = Object.entries(categoryNames).map(([key, label]) => '<button class="interest" data-category="'+key+'" aria-pressed="'+(state.category===key)+'">'+icon(key==='all'?'compass':key)+label+'</button>').join('');
  const items=visiblePlaces(), legacySaves=renderLegacySaves();
  const discovering=state.view!=='saved'&&state.loading;
  const discoveryError=state.view!=='saved'&&state.error;
  $('#result-count').textContent=discovering?'':`${items.length+legacySaves.length} places`;
- $('#list-title').textContent=state.view==='saved'?'Your little collection':state.view==='walks'?'Stops along the way':'Worth a little wander';
+ $('#list-title').textContent=state.view==='saved'?'Your little collection':'Worth a little wander';
  $('#list-context').textContent=state.view==='saved'?'Places you’ve saved on this device.':!state.area.id?'OpenStreetMap · Distances from your starting point.':'A few good places to start. Make the day your own.';
  const rows=items.map(p=>`<div class="place-row"><button class="place-main" data-place="${esc(p.id)}"><span class="place-icon ${esc(p.category)}">${icon(p.category)}</span><span><h3>${esc(p.name)}</h3><p>${esc(categoryNames[p.category]||'Place')} · ${distanceLabel(p)}</p></span></button><button class="save-button ${saved.some(s=>s.id===p.id)?'saved':''}" data-save="${esc(p.id)}" aria-label="${saved.some(s=>s.id===p.id)?'Unsave':'Save'} ${esc(p.name)}" aria-pressed="${saved.some(s=>s.id===p.id)}">${icon('bookmark')}</button></div>`).concat(legacySaves);
  $('#places-list').innerHTML=discovering?'<div class="loading">Finding places around you…</div>':rows.length?rows.join(''):`<div class="empty-state">${discoveryError?esc(discoveryError):state.view==='saved'?'A new favorite starts with a little curiosity. Save a place to find it here.':'No places match this interest nearby. Try another interest or a different area.'}${discoveryError?'<button id="retry-places">Try again</button>':''}</div>`;
- renderMarkers();renderDetail();renderTour();
+ renderMarkers();renderDetail();
 }
 function selectPlace(p){state.selected=p;panTo([p.lat,p.lng]);render();if(innerWidth<=720){$('.map-section').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}}
 function renderDetail() {
+ if (state.view === 'events') { renderEventVenue(); return; }
  const card = $('#detail-card');
  const place = state.selected;
  card.hidden = !place;
@@ -493,15 +498,34 @@ function renderDetail() {
   <div class="detail-source">Place information from <a href="${safeUrl(place.source)}" target="_blank" rel="noopener noreferrer">${esc(place.sourceLabel || 'the place source')}</a></div>`;
 }
 function toggleSave(id){const p=state.places.find(p=>p.id===id)||saved.find(p=>p.id===id);if(!p)return;const idx=saved.findIndex(s=>s.id===id);if(idx>=0){saved.splice(idx,1);toast('Removed from your saved places.');}else if(saved.length>=100){toast('Your collection is full. Remove a place before adding another.');return;}else{saved.push(p);toast('Saved for your next little adventure.');}persist();render();}
-function endTour(){state.tour=null;state.selected=null;renderWalk();render();}
-function startTour(){const stops=state.area.stops?state.area.stops.map(id=>state.places.find(p=>p.id===id)).filter(Boolean):visiblePlaces().sort((a,b)=>distance(a)-distance(b)).slice(0,4);if(!stops.length){toast('Choose a location with nearby places first.');return;}state.tour={stops,index:0};state.selected=stops[0];renderWalk();panTo([stops[0].lat,stops[0].lng]);render();if(innerWidth<=720){$('.map-section').scrollIntoView({behavior:'smooth'});$('#detail-card').hidden=true;}}
-function renderTour(){const card=$('#tour-card');card.hidden=!state.tour;if(!state.tour)return;const t=state.tour;card.innerHTML=`<button class="card-close" id="tour-close" aria-label="End neighborhood walk">${icon('close')}</button><span class="eyebrow">YOUR NEIGHBORHOOD WALK</span><h2>${esc(state.area.walkTitle||`A wander around ${state.area.name}`)}</h2><p>These are suggested stops for your walk. Open walking directions for the route.</p><div class="tour-stops">${t.stops.map((s,i)=>`<button class="tour-stop ${i===t.index?'active':''}" data-stop="${i}"><span>${i+1}</span>${esc(s.name)}</button>`).join('')}</div><div class="tour-controls"><button data-tour-prev ${t.index===0?'disabled':''}>Previous</button><span style="font-size:11px">${t.index+1} / ${t.stops.length}</span><button data-tour-next>${t.index===t.stops.length-1?'Finish walk':'Next stop'}</button></div><a href="${directionsUrl(t.stops)}" target="_blank" rel="noopener noreferrer">${icon('walk')}Walking directions in Google Maps</a>`;}
-function tourStep(i){if(!state.tour)return;if(i>=state.tour.stops.length){endTour();toast('A little wander, a few new favorites. Explore another place.');return;}state.tour.index=Math.max(0,i);state.selected=state.tour.stops[state.tour.index];panTo([state.selected.lat,state.selected.lng]);render();if(innerWidth<=1100){$('#detail-card').hidden=true;}}
 async function api(path,signal){const r=await fetch(path,{signal});const d=await r.json();if(!r.ok)throw new Error(d.error||'This service is temporarily unavailable. Please try again.');return d;}
-async function loadLocation(area){endTour();nearbyController?.abort();state.request++;state.area=area;state.center=area.center;state.view='explore';state.category='all';state.error='';state.selected=null;$('#search-results').hidden=true;$('#search-status').textContent='';$('#search-area').hidden=true;panTo(state.center);if(area.id){state.places=curated.filter(p=>p.area===area.id);state.loading=false;render();return;}state.places=[];state.loading=true;render();await loadNearby();}
+async function loadLocation(area) {
+ startSelection++;
+ closeStreetView(); cancelEventRequest(); searchController?.abort(); nearbyController?.abort(); state.request++;
+ state.area = area; state.center = area.center; state.hasStart = true; state.selected = null; state.error = '';
+ if (state.view === 'saved') state.view = liveEventMode ? 'events' : 'explore';
+ $('#search-results').hidden = true; $('#search-status').textContent = ''; $('#search-area').hidden = true;
+ $('#search-form button').disabled = false;
+ panTo(state.center, state.view === 'events' ? 14.7 : neighborhoodZoom);
+ if (liveEventMode) {
+  try { localStorage.setItem('patria-event-start:' + (window.patriaUser?.id || 'preview'), JSON.stringify({ name: area.name, center: area.center })); } catch {}
+ }
+ if (state.view === 'events') { await loadEvents(); return; }
+ if (area.id) { state.places = curated.filter(place => place.area === area.id); state.loading = false; render(); return; }
+ state.places = [];
+ await loadNearby();
+}
 async function loadNearby(){nearbyController?.abort();nearbyController=new AbortController();const version=++state.request;state.loading=true;state.error='';render();try{const d=await api(`/api/nearby?lat=${state.center[0]}&lng=${state.center[1]}&category=${state.category}`,nearbyController.signal);if(version!==state.request)return;state.places=d.places;state.loading=false;render();}catch(e){if(e.name==='AbortError'||version!==state.request)return;state.loading=false;state.error=e.message;render();}}
-async function searchLocation(query){searchController?.abort();const controller=new AbortController();searchController=controller;const button=$('#search-form button');button.disabled=true;$('#search-status').textContent='Finding your starting point…';$('#search-results').hidden=true;try{const d=await api(`/api/search?q=${encodeURIComponent(query)}`,controller.signal);if(controller.signal.aborted)return;const results=d.locations;if(!results.length){$('#search-status').textContent='No location found. Try a city name or a more complete address.';return;}$('#search-status').textContent='Choose a starting point:';$('#search-results').innerHTML=results.map((r,i)=>`<button class="search-result" data-result="${i}">${esc(r.name)}<small>${esc(r.address)}</small></button>`).join('');$('#search-results').hidden=false;$('#search-results').onclick=e=>{const b=e.target.closest('[data-result]');if(b){const r=results[Number(b.dataset.result)];loadLocation({name:r.name,center:[r.lat,r.lng]});}};}catch(e){if(e.name!=='AbortError')$('#search-status').textContent=e.message;}finally{if(!controller.signal.aborted)button.disabled=false;}}
-function setView(view){closeStreetView();state.view=view;state.category='all';endTour();}
+async function searchLocation(query){searchController?.abort();const controller=new AbortController();searchController=controller;const button=$('#search-form button');button.disabled=true;$('#search-status').textContent='Finding your starting point…';$('#search-results').hidden=true;try{const d=await api(`${localEventsPreview ? '/api/local' : '/api'}/search?country=CA&q=${encodeURIComponent(query)}`,controller.signal);if(controller.signal.aborted)return;const results=d.locations;if(!results.length){$('#search-status').textContent='No location found. Try a city name or a more complete address.';return;}$('#search-status').textContent='Choose a starting point:';$('#search-results').innerHTML=results.map((r,i)=>`<button class="search-result" data-result="${i}">${esc(r.name)}<small>${esc(r.address)}</small></button>`).join('');$('#search-results').hidden=false;$('#search-results').onclick=e=>{const b=e.target.closest('[data-result]');if(b){const r=results[Number(b.dataset.result)];loadLocation({name:r.name,center:[r.lat,r.lng]});}};}catch(e){if(e.name!=='AbortError')$('#search-status').textContent=e.message;}finally{if(!controller.signal.aborted)button.disabled=false;}}
+function setView(view) {
+ if (state.view === view) return;
+ closeStreetView(); cancelEventRequest(); nearbyController?.abort(); state.request++;
+ state.view = view; state.category = 'all'; state.selected = null; state.loading = false;
+ if (!state.hasStart) { render(); return; }
+ if (view === 'events') { loadEvents(); return; }
+ if (view === 'explore') { loadLocation(state.area); return; }
+ render();
+}
 function closeLayers() {
  $('#layer-options').hidden = true;
  $('#layers-button').setAttribute('aria-expanded', 'false');
@@ -557,7 +581,6 @@ async function setLayer(layer) {
   button.setAttribute('aria-pressed', String(button.dataset.layer === layer));
  });
  renderMarkers();
- renderWalk();
  renderDetail();
  return true;
 }
@@ -567,7 +590,23 @@ function setTraffic(enabled) {
  $('#traffic-toggle').setAttribute('aria-pressed', String(enabled));
  $('#traffic-status').hidden = !enabled;
 }
-document.addEventListener('click',e=>{const view=e.target.closest('[data-view]');if(view)setView(view.dataset.view);const cat=e.target.closest('[data-category]');if(cat){state.category=cat.dataset.category;state.selected=null;render();if(state.view!=='saved'&&!state.area.id)loadNearby();}const p=e.target.closest('[data-place]');if(p){const place=visiblePlaces().find(x=>x.id===p.dataset.place);if(place)selectPlace(place);}const save=e.target.closest('[data-save]');if(save)toggleSave(save.dataset.save);if(e.target.closest('[data-start-tour]'))startTour();if(e.target.closest('#detail-close')){state.selected=null;render();}if(e.target.closest('#tour-close'))endTour();const stop=e.target.closest('[data-stop]');if(stop)tourStep(Number(stop.dataset.stop));if(e.target.closest('[data-tour-prev]'))tourStep(state.tour.index-1);if(e.target.closest('[data-tour-next]'))tourStep(state.tour.index+1);if(e.target.closest('#retry-places'))loadNearby();const layer=e.target.closest('[data-layer]');if(layer){closeLayers();setLayer(layer.dataset.layer);}});
+document.addEventListener('click', event => {
+ const view = event.target.closest('[data-view]');
+ if (view) setView(view.dataset.view);
+ const category = event.target.closest('[data-category]');
+ if (category) {
+  state.category = category.dataset.category; state.selected = null; render();
+  if (state.view === 'explore' && state.hasStart && !state.area.id) loadNearby();
+ }
+ const row = event.target.closest('[data-place]');
+ if (row) { const place = visiblePlaces().find(item => item.id === row.dataset.place); if (place) selectPlace(place); }
+ const save = event.target.closest('[data-save]');
+ if (save) toggleSave(save.dataset.save);
+ if (event.target.closest('#detail-close')) { state.selected = null; render(); }
+ if (event.target.closest('#retry-places')) loadNearby();
+ const layer = event.target.closest('[data-layer]');
+ if (layer) { closeLayers(); setLayer(layer.dataset.layer); }
+});
 $('#search-form').onsubmit=e=>{e.preventDefault();const q=$('#location-search').value.trim();if(q)searchLocation(q);};
 $('#detail-card').addEventListener('click',event=>{
  const button=event.target.closest('[data-open-street]');
@@ -586,7 +625,20 @@ $('#street-view-back').onclick=()=>{
  (streetInvoker?.isConnected ? streetInvoker : $('#street-view-button')).focus({preventScroll:true});
  streetInvoker = undefined;
 };
-$('#locate-button').onclick=()=>{if(!navigator.geolocation){toast('Location is unavailable. Search a city or address instead.');return;}$('#locate-button').disabled=true;toast('Your browser will ask to use your location.');navigator.geolocation.getCurrentPosition(p=>{$('#locate-button').disabled=false;loadLocation({name:'Around you',center:[p.coords.latitude,p.coords.longitude]});},()=>{$('#locate-button').disabled=false;toast('Location couldn’t be accessed. Search an address or neighborhood instead.');},{timeout:12000,maximumAge:60000});};
+$('#locate-button').onclick = () => {
+ if (!navigator.geolocation) { toast('Location is unavailable. Search a city or address instead.'); return; }
+ const selection = ++startSelection;
+ const button = $('#locate-button');
+ button.disabled = true;
+ toast('Your browser will ask to use your location.');
+ navigator.geolocation.getCurrentPosition(position => {
+  button.disabled = false;
+  if (selection === startSelection) loadLocation({ name: 'Around you', center: [position.coords.latitude, position.coords.longitude] });
+ }, () => {
+  button.disabled = false;
+  if (selection === startSelection) toast('Location couldn’t be accessed. Search an address or neighborhood instead.');
+ }, { timeout: 12000, maximumAge: 60000 });
+};
 $('.map-section').insertAdjacentHTML('beforeend',`
  <button id="search-area" class="search-area dark-button" hidden>${icon('search')}Search this area</button>
  <div class="layer-control">
@@ -614,17 +666,19 @@ $('#traffic-toggle').onclick=async()=>{
  if (fromPhoto) toast('Live traffic is shown on the styled map.');
 };
 fetch('assets/photo-credits.json').then(r=>r.json()).then(d=>{$('#photo-credits').innerHTML='Neighborhood photographs (cropped to fit):<br>'+d.assets.map(a=>`<a href="${safeUrl(a.sourcePage)}" target="_blank" rel="noopener noreferrer">${esc(a.neighborhood)}</a>: ${esc(a.author)} · <a href="${safeUrl(a.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(a.license)}</a>`).join('<br>');}).catch(()=>{});
+installEventControls();
 icons();render();
 async function initializeMap() {
  fetch('/assets/marble-worlds.json').then(response=>response.ok ? response.json() : null).then(worlds=>{
   if(worlds){marbleWorlds=worlds;render();}
  }).catch(()=>{});
+ const profile = applyExplorerProfile();
  try {
   await initializeGoogleMap();
  } catch (error) {
   showMapError(error.message || 'The map could not load. Refresh the page to try again.');
  }
- await applyExplorerProfile();
+ await profile;
 }
 if(document.modelContext?.registerTool){try{document.modelContext.registerTool({name:'search_neighborhood',title:'Search a neighborhood',description:'Search for a location and show candidate starting points in the visible explorer.',inputSchema:{type:'object',properties:{query:{type:'string',minLength:1,maxLength:180}},required:['query'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},async execute(input){if(!input||typeof input.query!=='string'||!input.query.trim()||input.query.length>180)throw new Error('Provide a location query of 1–180 characters.');$('#location-search').value=input.query;await searchLocation(input.query);return {message:$('#search-status').textContent};}});}catch{}}
 
@@ -638,18 +692,13 @@ function profileLocation(profile) {
 }
 async function applyExplorerProfile() {
  try {
-  const profile=JSON.parse(localStorage.getItem('patria-profile:'+(window.patriaUser?.id||'preview'))||'null');
-  if(!profile)return;
-  if(!new URL(location.href).searchParams.has('area')){
-   const startingPoint = profileLocation(profile);
-   if(profile.areaId)await loadLocation(neighborhoods.find(n=>n.id===profile.areaId)||neighborhoods[0]);
-   else if(startingPoint)await loadLocation(startingPoint);
-   else if(profile.placeId)toast('Search again to set your starting point on OpenStreetMap.');
-  }
-  preferredInterests=(profile.interests||[]).filter(i=>i!=='all'&&categoryNames[i]);
-  state.category=preferredInterests.length===1?preferredInterests[0]:'all';
-  if(!state.area.id&&state.category!=='all')await loadNearby();
-  if(profile.rhythm==='walk')state.view='walks';
-  render();
- }catch{}
+  const key = window.patriaUser?.id || 'preview';
+  const profile = JSON.parse(localStorage.getItem('patria-profile:' + key) || 'null');
+  const params = new URL(location.href).searchParams;
+  if (profile) preferredInterests = (profile.interests || []).filter(key => key !== 'all' && categoryNames[key]);
+  if (params.has('area')) return;
+  const savedStart = liveEventMode && JSON.parse(localStorage.getItem('patria-event-start:' + key) || 'null');
+  const start = profileLocation({ location: savedStart }) || (profile?.areaId ? neighborhoods.find(area => area.id === profile.areaId) : profileLocation(profile || {}));
+  if (start) await loadLocation(start);
+ } catch {}
 }

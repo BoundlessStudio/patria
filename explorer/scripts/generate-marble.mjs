@@ -26,7 +26,7 @@ function approvedMedia(source) {
 
 function generationRequest(manifest) {
   const { collection, target, displayName, prompt, sources } = manifest;
-  if (!['walks', 'places'].includes(collection) || typeof target !== 'string' || !target.trim()
+  if (!['events', 'venues', 'places', 'walks'].includes(collection) || typeof target !== 'string' || !target.trim()
       || typeof displayName !== 'string' || !displayName.trim() || displayName.length > 64
       || typeof prompt !== 'string' || !prompt.trim() || !Array.isArray(sources) || !sources.length) {
     throw new Error('Set a walk or place target, name, scene prompt, and source credits in the manifest.');
