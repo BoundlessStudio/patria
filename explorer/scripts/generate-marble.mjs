@@ -25,11 +25,14 @@ function approvedMedia(source) {
 }
 
 function generationRequest(manifest) {
-  const { collection, target, displayName, prompt, sources } = manifest;
+  const { collection, target, displayName, prompt, sources, model = 'marble-1.1' } = manifest;
   if (!['events', 'venues', 'places', 'walks'].includes(collection) || typeof target !== 'string' || !target.trim()
       || typeof displayName !== 'string' || !displayName.trim() || displayName.length > 64
       || typeof prompt !== 'string' || !prompt.trim() || !Array.isArray(sources) || !sources.length) {
     throw new Error('Set a walk or place target, name, scene prompt, and source credits in the manifest.');
+  }
+  if (!['marble-1.1', 'marble-1.1-plus', 'marble-1.0', 'marble-1.0-draft'].includes(model)) {
+    throw new Error('Select a supported Marble model.');
   }
   for (const source of sources) {
     sourceUrl(source.url);
@@ -61,13 +64,13 @@ function generationRequest(manifest) {
     });
     world_prompt = { type: 'multi-image', multi_image_prompt, text_prompt };
   }
-  return { display_name: displayName.trim(), model: 'marble-1.1', permission: { public: false }, world_prompt };
+  return { display_name: displayName.trim(), model, permission: { public: false }, world_prompt };
 }
 
 async function marble(path, body) {
   const apiKey = process.env.WLT_API_KEY?.trim();
   if (!apiKey) throw new Error('Set WLT_API_KEY in the local .env to contact World Labs.');
-  const response = await fetch(new URL(path, apiRoot), {
+  const response = await fetch(new URL('./' + path, apiRoot), {
     headers: { 'WLT-Api-Key': apiKey, 'Content-Type': 'application/json' },
     method: body ? 'POST' : 'GET',
     body: body ? JSON.stringify(body) : undefined,

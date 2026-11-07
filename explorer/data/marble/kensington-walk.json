@@ -1,14 +1,21 @@
 {
   "collection": "walks",
   "target": "kensington",
-  "displayName": "Kensington Market to Bellevue Square",
-  "prompt": "Create a short, explorable scene inspired by Kensington Market in Toronto, from the market's low-rise commercial streets toward the edge of Bellevue Square Park. Keep a continuous walkable sidewalk with a clear turn and a greener open space at the end. Use narrow sidewalks, low brick shopfronts, simple bicycle rings, and modest curbside planting. Give the buildings solid muted clay, sand, and slate finishes with simple forms and soft directional shadows. Use the walking viewpoint of a person on the sidewalk. Represent the neighborhood as a stylized interpretation and leave out precise signage and invented landmarks.",
+  "displayName": "Kensington Market to Bellevue Square Park",
+  "model": "marble-1.1-plus",
+  "prompt": "Build a continuous pedestrian scene inspired by the roughly 180-metre route through Kensington Market, Toronto. Start at sidewalk height at the mouth of Littlehayes Lane on Baldwin Street, looking west. Follow Baldwin toward Augusta Avenue, turn left and head south down Augusta, then turn right at Denison Square and continue alongside the north edge of Bellevue Square Park toward Bellevue Avenue. Keep the shopfronts, both corners, and the park edge connected by a clear sidewalk with crossings. Begin with narrow sidewalks and low brick storefronts, then open up into mature trees, benches, and lawn at the park. Use solid muted clay, sand, and slate buildings, small bicycle rings, and soft directional shadows. Keep it a stylized interpretation with simple forms, natural street proportions, and minimal signage.",
   "sources": [
     {
       "use": "context",
       "url": "https://www.openstreetmap.org/#map=18/43.6544/-79.4017",
       "credit": "OpenStreetMap contributors",
       "license": "ODbL 1.0"
+    },
+    {
+      "use": "context",
+      "url": "https://routing.openstreetmap.de/about.html",
+      "credit": "FOSSGIS pedestrian routing using OpenStreetMap",
+      "license": "OpenStreetMap ODbL 1.0"
     },
     {
       "use": "context",
